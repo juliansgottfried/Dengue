@@ -1,14 +1,14 @@
 library(dplyr)
 library(purrr)
 
-print("Removing variables containing 'X'")
+print("Ignoring params containing 'X'")
 
 data<-c("results","stats")
 
 lapply(data,function(type) {
     print(paste0("data = ",type))
-    paths<-list.files(paste0("./out/",type),full.names=T)
-    names<-list.files(paste0("./out/",type),full.names=F)
+    paths<-list.files(paste0("../out/",type),full.names=T)
+    names<-list.files(paste0("../out/",type),full.names=F)
 
     map2(paths,names,function(path,name) {
         print(paste0("name = ",name))
@@ -19,7 +19,7 @@ lapply(data,function(type) {
 		accum<-bind_rows(accum,add)
 	}
 	accum<-accum%>%select(-contains("X",ignore.case=F))
-        write.csv(accum,paste0("results/",name,"/",type,".csv"),row.names=F)
+        write.csv(accum,paste0("../results/",name,"/",type,".csv"),row.names=F)
         print("Success")
     })
 })
