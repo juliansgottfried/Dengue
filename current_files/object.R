@@ -72,12 +72,17 @@ rinit <- Csnippet("
 ")
 
 dmeas <- Csnippet("
-    lik = dnorm(C,cases,sig_obs,1)-pnorm(0,cases,sig_obs,0,1);
+    double size = 1.0/sig_obs/sig_obs;
+    double prob = size/(C+size);
+    static double tol = 1.0e-18;
+    lik = dnbinom(cases,size,prob+tol,0)+tol;
+    if (give_log) lik = log(lik);
 ")
 
 rmeas <- Csnippet("
-    cases = -1;
-    while (cases<0) cases = rnorm(C,sig_obs);
+    double size = 1.0/sig_obs/sig_obs;
+    double prob = size/(C+size);
+    cases = rnbinom(size,prob);
 ")
 
 par_names <- c("sigma",
