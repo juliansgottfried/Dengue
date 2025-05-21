@@ -10,9 +10,9 @@ n_array <- as.numeric(args[1])
 array_id <- as.numeric(args[2])
 n_cores <- as.numeric(args[3])
 fit_name <- args[4]
-path <- paste0("folders_for_fit/",fit_name,"/")
+path <- paste0("../folders_for_fit/",fit_name,"/")
 
-source("./helpers/helper_functions.R")
+source("./helper_functions.R")
 
 seed <- 9087235
 set.seed(seed)
@@ -99,7 +99,7 @@ run_fitting(po=pomped,
             allow_parallel=T,
             start_index=1,
             output_to_file=T,
-            output_result=paste0("out/results/",fit_name,"/",as.character(array_id),".csv"),
-            output_log=paste0("out/log/",fit_name,"/",as.character(array_id),".txt"),
+            output_result=paste0("../out/results/",fit_name,"/",as.character(array_id),".csv"),
+            output_log=paste0("../out/log/",fit_name,"/",as.character(array_id),".txt"),
             output_format="data.frame",
-            stats_path=paste0("out/stats/",fit_name,"/",as.character(array_id),".csv"))
+            stats_path=paste0("../out/stats/",fit_name,"/",as.character(array_id),".csv"))

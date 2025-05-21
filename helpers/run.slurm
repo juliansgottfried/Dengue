@@ -12,7 +12,7 @@ module unload r
 module unload gcc
 
 module load r/gcc/4.3.1
-Rscript fit.R \
+Rscript helpers/fit.R \
     $SLURM_ARRAY_TASK_MAX \
     $SLURM_ARRAY_TASK_ID \
     $SLURM_NTASKS_PER_NODE \

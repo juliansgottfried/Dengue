@@ -12,5 +12,5 @@ for i in "${!runs[@]}"; do
         --output=out/output/$name/slurm-%A_%a.out \
         --job-name=$name \
         --time=${args[i]} \
-        run.slurm
+        helpers/run.slurm
 done
