@@ -7,7 +7,6 @@ for i in "${!runs[@]}"; do
     mkdir /scratch/$USER/out/results/$name
     mkdir /scratch/$USER/out/log/$name
     mkdir /scratch/$USER/out/stats/$name
-    mkdir /scratch/$USER/results/$name
     sbatch \
         --output=/scratch/$USER/out/output/$name/slurm-%A_%a.out \
         --job-name=$name \

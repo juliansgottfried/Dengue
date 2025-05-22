@@ -20,8 +20,8 @@ In the cluster, run "bash launch.sh t\_1 t\_2 t\_3 ..." where "t\_i" is the time
 
 Save results:
 
-In the cluster, run "bash collate.sh". This places "results.csv" and "stats.csv" into "results/[run]", where [run] corresponds to folders in "folders_for_fit".
-Transfer these files to your local copy of the repo. Finally, copy them elsewhere in your machine for further work.
+In the cluster, run "bash collate.sh". This places "results.csv" and "stats.csv" into the corresponding folder under "folders_for_fit".
+Transfer each folder back to your local copy of the repo. Copy the results elsewhere in your machine for further work, because the repo will be re-set.
 
 Re-set directory:
 
