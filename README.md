@@ -17,7 +17,7 @@ The folder "current_files" contains samples of the above files.
 
 Run:
 
-Run "bash launch.sh t1 t2 t3 ..." where "t\_i" is the time limit in minutes corresponding to the ith folder in "folders_for_fit", in order. 90 minutes is a good first guess.
+Run "bash launch.sh t\_1 t\_2 t\_3 ..." where "t\_i" is the time limit in minutes corresponding to the ith folder in "folders_for_fit", in order. 90 minutes is a good first guess.
 
 Gather results:
 
