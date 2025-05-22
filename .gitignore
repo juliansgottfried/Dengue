@@ -1,4 +1,4 @@
-/scratch/$USER/out
-/scratch/$USER/results
-/scratch/$USER/folders_for_fit
-/scratch/$USER/profiling_etc
+out
+results
+folders_for_fit
+profiling_etc
