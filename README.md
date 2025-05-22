@@ -17,15 +17,15 @@ The folder "current_files" contains samples of the above files.
 
 Run:
 
-Run "bash launch.sh a b c ..." where "a b c ..." are time limits in minutes corresponding to each folder in "folders_for_fit", in order. 90 minutes is a good first guess.
+Run "bash launch.sh t1 t2 t3 ..." where "t\_i" is the time limit in minutes corresponding to the ith folder in "folders_for_fit", in order. 90 minutes is a good first guess.
 
 Gather results:
 
-Run "bash collate.sh". This places "results.csv" and "stats.csv" into "results/[folder]" where "[folder]" corresponds to a folder in "folders_for_fit".
+Run "bash collate.sh". This places "results.csv" and "stats.csv" into "results/[run]" for each run folder in "folders_for_fit".
 
 Transfer results:
 
-Use Globus or some other method to transfer "results.csv" and "stats.csv" to your local computer.
+Use Globus or some other method to transfer "results.csv" and "stats.csv" to your local machine.
 
 Re-set directory:
 
