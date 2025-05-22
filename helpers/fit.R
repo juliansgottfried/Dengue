@@ -14,7 +14,7 @@ n_cores <- as.numeric(args[3])
 fit_name <- args[4]
 path <- paste0("/scratch/",log_name,"/folders_for_fit/",fit_name,"/")
 
-source("/scratch/",log_name,"/helpers/helper_functions.R")
+source(paste0("/scratch/",log_name,"/helpers/helper_functions.R"))
 
 seed <- 9087235
 set.seed(seed)
