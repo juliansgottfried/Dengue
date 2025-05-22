@@ -1,6 +1,6 @@
 TO SET UP ENVIRONMENT:
 
-Place all files in repo into scratch home directory "/scratch/$USER/". Renv should activate automatically.
+Place all files and folders in repo into scratch home directory "/scratch/$USER/". Renv should activate automatically.
 
 Run "bash set_up.sh". Renv may ask for permission for some action.
 
@@ -13,7 +13,7 @@ Inside each folder place the data file "bk_df.csv", the object "object.R", and t
 
 The file "pars.csv" should have exactly 500 rows.
 
-The folder "current_files" contains samples of the above files.
+The folder "sample_files" contains a folder for an example run.
 
 Run:
 
