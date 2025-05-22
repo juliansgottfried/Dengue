@@ -29,4 +29,4 @@ Use Globus or some other method to transfer "results.csv" and "stats.csv" to you
 
 Re-set directory:
 
-Run "bash clean.sh" and press ENTER to confirm.
+Run "bash clean.sh" and press ENTER to confirm. This removes all input and output files.
