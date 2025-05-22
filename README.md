@@ -1,7 +1,8 @@
 TO SET UP ENVIRONMENT:
 
-Place all files in repo into scratch home directory "/scratch/$USER/".
-Run "bash make_folders.sh".
+Place all files in repo into scratch home directory "/scratch/$USER/". Renv should activate automatically.
+
+Run "bash set_up.sh". Renv may ask for permission for some action.
 
 TO RUN:
 
