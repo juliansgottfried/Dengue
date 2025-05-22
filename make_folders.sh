@@ -1,7 +1,7 @@
-mkdir out
-mkdir out/log
-mkdir out/results
-mkdir out/stats
-mkdir out/output
-mkdir results
-mkdir folders_for_fit
+mkdir /scratch/$USER/out
+mkdir /scratch/$USER/out/log
+mkdir /scratch/$USER/out/results
+mkdir /scratch/$USER/out/stats
+mkdir /scratch/$USER/out/output
+mkdir /scratch/$USER/results
+mkdir /scratch/$USER/folders_for_fit

@@ -1,5 +1,6 @@
 TO SET UP ENVIRONMENT:
 
+Place all files in repo into your scratch home directory "/scratch/$USER/".
 Run "bash make_folders.sh".
 
 TO RUN:

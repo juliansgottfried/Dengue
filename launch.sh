@@ -1,16 +1,16 @@
-runs=($(ls folders_for_fit))
+runs=($(ls /scratch/$USER/folders_for_fit))
 i=0
 args=("$@")
 for i in "${!runs[@]}"; do
     name=${runs[i]}
-    mkdir out/output/$name
-    mkdir out/results/$name
-    mkdir out/log/$name
-    mkdir out/stats/$name
-    mkdir results/$name
+    mkdir /scratch/$USER/out/output/$name
+    mkdir /scratch/$USER/out/results/$name
+    mkdir /scratch/$USER/out/log/$name
+    mkdir /scratch/$USER/out/stats/$name
+    mkdir /scratch/$USER/results/$name
     sbatch \
-        --output=out/output/$name/slurm-%A_%a.out \
+        --output=/scratch/$USER/out/output/$name/slurm-%A_%a.out \
         --job-name=$name \
         --time=${args[i]} \
-        helpers/run.slurm
+        /scratch/$USER/helpers/run.slurm
 done
