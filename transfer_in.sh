@@ -6,5 +6,5 @@ fi
 
 args=("$@")
 for arg in "${args[@]}"; do
-	cp $store_path/$arg $local_path/folders_for_fit
+	cp -r $store_path/$arg $local_path/folders_for_fit
 done
