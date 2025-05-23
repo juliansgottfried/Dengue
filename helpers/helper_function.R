@@ -46,7 +46,7 @@ run_fitting <- function(
                            "loglik",
                            "loglik.se",
                            "flag")
-        result[1] <- start_index + i - 1
+        result[1] <- i
         if (length(coef(mifout)) > 0) {
             loglik_mif <- tryCatch(replicate(n = 10,
                                              logLik(pfilter(po,
