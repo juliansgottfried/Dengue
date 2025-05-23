@@ -4,7 +4,7 @@ On the cluster:
 
 Place the repo into your scratch home directory so that the path to the directory is "scratch/$USER/Dengue/". Renv should activate itself automatically. Run "bash set_up.sh" to create folder structure and complete renv activation; you may be asked to grant permission for some action.
 
-On your local machine:
+Next, on your local machine:
 
 Place the repo somewhere on your computer. Make a secondary directory somewhere else to store fitting files and results. In the file "path_vars.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively.
 
