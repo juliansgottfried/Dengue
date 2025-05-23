@@ -1,28 +1,25 @@
-TO SET UP ENVIRONMENT:
+TO SET UP ENVIRONMENT
 
-Working in the cluster, place the Dengue repo into your scratch home directory "/scratch/$USER/" so that the path to the directory is "scratch/$USER/Dengue/". Renv should activate automatically.
+On the cluster:
 
-Run "bash set_up.sh". Renv may ask for permission for some action.
+Place this repo into your scratch home directory so that the path to the directory is "scratch/$USER/Dengue/". Renv should activate itself automatically. Run "bash set_up.sh" to create folder structure and complete renv activation; you may be asked to grant permission for some action.
 
-TO RUN:
+On your local machine:
 
-Set-up:
+Place this repo somewhere on your computer. Make a secondary directory somewhere else to store fitting results. In the files "transfer_in.sh" and "transfer_out.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively.
 
-Working in your local machine, create a folder for each fit. Name the folders "run_[month]\_[day]\_[x]", where "[x]" is a lowercase letter corresponding to the run.
-Inside each folder, place the data file "bk_df.csv", the object "object.R", and the parameter combinations "pars.csv".
-Place the folders inside "folders_for_fit" in your local copy of the repo, and transfer to the cluster repo.
+TO RUN
 
-Note -- the file "pars.csv" should have exactly 500 rows.
+1. Within the secondary directory on your computer, create a folder for each fitting run. Name each folder "run_[month]\_[day]\_[x]", where "[x]" is a lowercase letter corresponding to the run. Inside each folder, place the data file "bk_df.csv", the object "object.R", and the parameter combinations "pars.csv" ("pars.csv" should have exactly 500 rows).
 
-Run:
+2. In the local repo, run "bash transfer_in.sh run1 run2 run3 ..." where "runi" is the name of the ith run folder. Push the repo.
 
-In the cluster, run "bash launch.sh t\_1 t\_2 t\_3 ..." where "t\_i" is the time limit in minutes corresponding to the ith folder in "folders_for_fit", in lexicographic order. 90 minutes is a good first guess.
+3. In the cluster, pull the repo.
 
-Save results:
+4. Run "bash launch.sh t1 t2 t3 ..." where "ti" is the time limit in minutes for the ith run folder, in lexicographic order by folder name. 90 minutes is a good first guess!
 
-In the cluster, run "bash collate.sh". This places "results.csv" and "stats.csv" into the corresponding folder under "folders_for_fit".
-Transfer each folder back to your local copy of the repo. Copy the results elsewhere in your machine for further work, because the repo will be re-set.
+5. Once every run is finished, run "bash collate.sh". Push the repo.
 
-Re-set directory:
+6. On your local machine, pull the repo. Run "bash transfer_out.sh". Each run folder in your secondary directory should now contain "results.csv" and "stats.csv". Verify that these files are sound.
 
-In the cluster, run "bash clean.sh" and press ENTER to confirm. This removes all input and output files.
+7. On the cluster, run "bash clean.sh" and press ENTER to confirm. Push the repo and pull on your local machine.
