@@ -1,7 +1,6 @@
 run_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
-        start_index,
         result_path,
         log_path,
         stats_path) {
@@ -19,10 +18,9 @@ run_fitting <- function(
         param <- as.numeric(parameters[i, ])
         names(param) <- colnames(parameters)
         
-        cat(paste("Starting iteration",
-                  start_index + i - 1, "\n"),
-            file = log_path,
-            append = TRUE)
+        cat(paste("Starting iteration", i, "\n"),
+		file = log_path,
+                append = TRUE)
             
         mifout <- tryCatch(po |>
                                mif2(Np = 1000,

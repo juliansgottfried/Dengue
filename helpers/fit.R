@@ -14,7 +14,7 @@ n_cores <- as.numeric(args[3])
 fit_name <- args[4]
 path <- paste0("/scratch/",log_name,"/Dengue/folders_for_fit/",fit_name,"/")
 
-source(paste0("/scratch/",log_name,"/Dengue/helpers/helper_functions.R"))
+source(paste0("/scratch/",log_name,"/Dengue/helpers/helper_function.R"))
 
 seed <- 9087235
 set.seed(seed)
@@ -58,50 +58,24 @@ pomped <- pomp(
 len <- nrow(init_vals)/n_array
 init_vals <- init_vals[((array_id-1)*len+1):(array_id*len),]
 
-paste0("rw.sd.1<-rw_sd(",
-       paste0(est_pars,
-              ifelse(
-                  str_sub(est_pars,-2,-1)!="_0",
-                     paste0("=0.02"),
-                     paste0("=ivp(0.01)")),
-              collapse=","),
-       ")") %>% 
-    str2expression %>% 
-    eval.parent
-
-paste0("rw.sd.2<-rw_sd(",
-       paste0(est_pars,
-              ifelse(
-                  str_sub(est_pars,-2,-1)!="_0",
-                     paste0("=0.01"),
-                     paste0("=ivp(0.005)")),
-              collapse=","),
-       ")") %>%
-    str2expression %>%
-    eval.parent
-
-paste0("rw.sd.3<-rw_sd(",
-       paste0(est_pars,
-              ifelse(
-                  str_sub(est_pars,-2,-1)!="_0",
-                     paste0("=0.001"),
-                     paste0("=ivp(0.001)")),
-              collapse=","),
-       ")") %>%
-    str2expression %>%
-    eval.parent
+non_ivp <- c(0.02,0.01,0.001)
+ivp <- c(0.01,0.005,0.001)
+lapply(1:3,function(order) {
+    paste0(paste0("rdd",order),
+           "<-rw_sd(",
+           paste0(est_pars,ifelse(str_sub(est_pars,-2,-1)!="_0",
+                                  paste0("=",non_ivp[order]),
+                                  paste0("=ivp(",ivp[order],")")),
+                  collapse=","),")") %>%
+        str2expression %>%
+        eval.parent
+})
 
 run_fitting(po=pomped,
             n_cores=n_cores,
             parameters=init_vals,
             seed_num=seed,
-            rdd1=rw.sd.1,
-	    rdd2=rw.sd.2,
-	    rdd3=rw.sd.3,
-            allow_parallel=T,
-            start_index=1,
-            output_to_file=T,
-            output_result=paste0("/scratch/",log_name,"/Dengue/out/results/",fit_name,"/",as.character(array_id),".csv"),
-            output_log=paste0("/scratch/",log_name,"/Dengue/out/log/",fit_name,"/",as.character(array_id),".txt"),
-            output_format="data.frame",
+            rdd1=rdd1,rdd2=rdd2,rdd3=rdd3,
+            result_path=paste0("/scratch/",log_name,"/Dengue/out/results/",fit_name,"/",as.character(array_id),".csv"),
+            log_path=paste0("/scratch/",log_name,"/Dengue/out/log/",fit_name,"/",as.character(array_id),".txt"),
             stats_path=paste0("/scratch/",log_name,"/Dengue/out/stats/",fit_name,"/",as.character(array_id),".csv"))
