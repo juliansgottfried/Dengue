@@ -1,5 +1,4 @@
-local_path=/Users/juliangottfried/Desktop/dengue_github/Dengue
-store_path=/Users/juliangottfried/Desktop/NYU/thailand/cluster_runs
+source path_vars.sh
 
 runs=($(ls $local_path/folders_for_fit))
 for name in "${runs[@]}"; do
