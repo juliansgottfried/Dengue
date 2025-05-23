@@ -16,7 +16,7 @@ TO RUN
 
 3. Run "bash transfer_in.sh". Push the repo.
 
-4. In the cluster, pull the repo. In the file "run_times.txt", write time limits in minutes for each run, each on a new line, in lexicographic order by folder name (i.e. earlier dates first, then earlier letters). 90 minutes is a good initial limit.
+4. In the cluster, pull the repo. In the file "run_times.txt", write time limits in minutes for each run, each on a new line, in alphabetical order by folder name. 90 minutes is a good initial limit.
 
 5. Run "bash launch.sh".
 
