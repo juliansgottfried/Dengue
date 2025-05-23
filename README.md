@@ -14,12 +14,10 @@ TO RUN
 
 2. In the local repo, run "bash transfer_in.sh run_1 run_2 run_3 ..." where "run_i" is the name of the ith run folder. Push the repo.
 
-3. In the cluster, pull the repo.
+3. In the cluster, pull the repo. Run "bash launch.sh t_1 t_2 t_3 ..." where "t_i" is the time limit in minutes for the ith run folder, in lexicographic order by folder name. 90 minutes is a good first guess!
 
-4. Run "bash launch.sh t_1 t_2 t_3 ..." where "t_i" is the time limit in minutes for the ith run folder, in lexicographic order by folder name. 90 minutes is a good first guess!
+4. Once every run is finished, run "bash collate.sh". Push the repo.
 
-5. Once every run is finished, run "bash collate.sh". Push the repo.
+5. On your local machine, pull the repo. Run "bash transfer_out.sh". Each run folder in your secondary directory should now contain "results.csv" and "stats.csv". Verify that these files are sound.
 
-6. On your local machine, pull the repo. Run "bash transfer_out.sh". Each run folder in your secondary directory should now contain "results.csv" and "stats.csv". Verify that these files are sound.
-
-7. On the cluster, run "bash clean.sh" and press ENTER to confirm. Push the repo and pull on your local machine.
+6. On the cluster, run "bash clean.sh" and press ENTER to confirm. Push the repo and pull on your local machine.
