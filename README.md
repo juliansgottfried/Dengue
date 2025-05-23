@@ -1,6 +1,6 @@
 TO SET UP ENVIRONMENT:
 
-Working in the cluster, place the Dengue repo into your scratch home directory "/scratch/$USER/" so that the path to the directory is "scratch/$USER/Dengue". Renv should activate automatically.
+Working in the cluster, place the Dengue repo into your scratch home directory "/scratch/$USER/" so that the path to the directory is "scratch/$USER/Dengue/". Renv should activate automatically.
 
 Run "bash set_up.sh". Renv may ask for permission for some action.
 
