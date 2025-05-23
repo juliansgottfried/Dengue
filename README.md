@@ -20,4 +20,4 @@ TO RUN
 
 5. On your local machine, pull the repo. Run "bash transfer_out.sh". Each run folder in your secondary directory should now contain "results.csv" and "stats.csv". Verify that these files are complete before proceeding with the last step.
 
-6. On the cluster, run "bash clean.sh" and press ENTER to confirm. Push the repo and pull on your local machine to synchronize.
+6. On the cluster, run "bash clean.sh" and press "ENTER" to confirm. Push the repo and pull on your local machine to synchronize.
