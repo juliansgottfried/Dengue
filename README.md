@@ -6,7 +6,7 @@ Place this repo into your scratch home directory so that the path to the directo
 
 On your local machine:
 
-Place this repo somewhere on your computer. Make a secondary directory somewhere else to store fitting results. In the file "path_vars.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively.
+Place this repo somewhere on your computer. Make a secondary directory somewhere else to store fitting files and results. In the file "path_vars.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively.
 
 TO RUN
 
