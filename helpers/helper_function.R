@@ -2,8 +2,8 @@ run_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
         start_index,
-        output_result,
-        output_log,
+        result_path,
+        log_path,
         stats_path) {
     
     cl <- parallel::makeCluster(n_cores)
@@ -21,7 +21,7 @@ run_fitting <- function(
         
         cat(paste("Starting iteration",
                   start_index + i - 1, "\n"),
-            file = output_log,
+            file = log_path,
             append = TRUE)
             
         mifout <- tryCatch(po |>
@@ -60,7 +60,7 @@ run_fitting <- function(
                 bl <- logmeanexp(loglik_mif, se = TRUE)
                 loglik_mif_est <- bl[1]
                 loglik_mif_se <- bl[2]
-                cat(paste(i, loglik_mif_est, "\n"), file = output_log, append = TRUE)
+                cat(paste(i, loglik_mif_est, "\n"), file = log_path, append = TRUE)
                 result[length(result)] <- 2
             }
             if (is.numeric(loglik_mif)) {
@@ -71,7 +71,7 @@ run_fitting <- function(
             }
         } else {
             result[length(result)] <- 3
-            cat(paste(i, "failed", "\n"), file = output_log, append = TRUE)
+            cat(paste(i, "failed", "\n"), file = log_path, append = TRUE)
         }
         result
     }
@@ -79,9 +79,9 @@ run_fitting <- function(
         bind_rows() |>
         remove_missing()
     write.table(r1, 
-                output_result,
+                result_path,
                 append = TRUE,
-                col.names = !file.exists(output_result),
+                col.names = !file.exists(result_path),
                 row.names = FALSE, sep = ",")
     
     stopCluster(cl)
