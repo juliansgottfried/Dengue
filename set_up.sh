@@ -3,7 +3,6 @@ mkdir /scratch/$USER/Dengue/out/log
 mkdir /scratch/$USER/Dengue/out/results
 mkdir /scratch/$USER/Dengue/out/stats
 mkdir /scratch/$USER/Dengue/out/output
-mkdir /scratch/$USER/Dengue/folders_for_fit
 
 module unload r
 module unload gcc
