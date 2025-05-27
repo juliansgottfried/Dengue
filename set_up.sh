@@ -4,6 +4,7 @@ mkdir /scratch/$USER/Dengue/out/results
 mkdir /scratch/$USER/Dengue/out/stats
 mkdir /scratch/$USER/Dengue/out/output
 
+echo "folders_for_fit/*" >> .git/info/exclude
 echo \!folders_for_fit/$USER >> .git/info/exclude
 
 module unload r
