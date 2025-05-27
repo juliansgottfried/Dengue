@@ -1,5 +1,8 @@
 source path_vars.sh
 
+if [ ! -d $local_path/folders_for_fit ]; then
+        mkdir $local_path/folders_for_fit
+fi
 if [ ! -d $local_path/folders_for_fit/$user_name ]; then
         mkdir $local_path/folders_for_fit/$user_name
 fi
