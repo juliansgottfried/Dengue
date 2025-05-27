@@ -21,7 +21,7 @@ lapply(data,function(type) {
 		accum<-bind_rows(accum,add)
 	}
 	accum<-accum%>%select(-contains("X",ignore.case=F))
-        write.csv(accum,paste0("/scratch/",log_name,"/Dengue/folders_for_fit/",name,"/",type,".csv"),row.names=F)
+        write.csv(accum,paste0("/scratch/",log_name,"/Dengue/folders_for_fit/",log_name,"/",name,"/",type,".csv"),row.names=F)
         print("Success")
     })
 })

@@ -12,7 +12,7 @@ n_array <- as.numeric(args[1])
 array_id <- as.numeric(args[2])
 n_cores <- as.numeric(args[3])
 fit_name <- args[4]
-path <- paste0("/scratch/",log_name,"/Dengue/folders_for_fit/",fit_name,"/")
+path <- paste0("/scratch/",log_name,"/Dengue/folders_for_fit/",log_name,"/",fit_name,"/")
 
 source(paste0("/scratch/",log_name,"/Dengue/helpers/helper_function.R"))
 
