@@ -6,7 +6,7 @@ Place the repo into your scratch home directory so that the path to the director
 
 Next, on your local machine:
 
-Place the repo somewhere on your computer. Make a secondary directory somewhere else to store fitting files and results. In the file "path_vars.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively.
+Place the repo somewhere on your computer. Make a secondary directory somewhere else to store fitting files and results. In the file "path_vars.sh", edit the "local_path" and "store_path" variables to be the path names to the repo and the secondary directory, respectively. Edit the variable "user_name" to be your cluster username. If you're not sure what it is, run "echo $LOGNAME" in the cluster to find out.
 
 TO RUN
 
