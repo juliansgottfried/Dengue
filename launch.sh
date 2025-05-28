@@ -1,10 +1,10 @@
 runs=($(ls /scratch/$USER/Dengue/folders_for_fit))
 
-times=($(cat /scratch/$USER/Dengue/run_times.txt))
+echo "You will be prompted to enter time limits for each run. 90 minutes is a good initial limit."
 
 for i in "${!runs[@]}"; do
     name=${runs[i]}
-    time=${times[i]}
+    read -p "Enter time limit (in minutes) for $name: " run_time 
     mkdir /scratch/$USER/Dengue/out/output/$name
     mkdir /scratch/$USER/Dengue/out/results/$name
     mkdir /scratch/$USER/Dengue/out/log/$name
@@ -12,6 +12,6 @@ for i in "${!runs[@]}"; do
     sbatch \
         --output=/scratch/$USER/Dengue/out/output/$name/slurm-%A_%a.out \
         --job-name=$name \
-        --time=$time \
+        --time=$run_time \
         /scratch/$USER/Dengue/helpers/run.slurm
 done
