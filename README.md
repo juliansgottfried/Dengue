@@ -10,7 +10,7 @@ Make a directory to store fitting files. Download the files "download.sh" and "u
 
 TO RUN
 
-1. Within the directory on your computer, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a letter corresponding to the run.
+1. Within the directory on your computer, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a lowercase letter corresponding to the run.
 
 2. Inside each folder, place the data file "bk_df.csv", the object "object.R", and the parameter combinations "pars.csv" (this last file should have exactly 500 rows).
 
