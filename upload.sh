@@ -10,18 +10,22 @@ while [[ "$flagger" != "y" ]] ; do
 	echo ""
 	echo "Below, enter run IDs (lowercase letters)"
 	echo ""
-	echo "Enter \"0\" once all run IDs are entered"
+	echo "Enter \"0\" once all run IDs are in"
 	echo ""
 	i=1
-	read -p "Enter ID #$i: " run_id
+	read -p "ID #$i: " run_id
 	while [[ "$run_id" != "0" ]] ; do
 		echo run_$run_date\_$run_id >> tmp.txt
 		((i++))
-		read -p "Enter ID #$i: " run_id
+		read -p "ID #$i: " run_id
 	done
 
+	echo ""
+        echo "Printing folder names:"
+        echo ""
 	cat tmp.txt
-	read -p "Are these fit names correct? (y/n): " flagger
+	read -p "Are these folder names correct? (y/n): " flagger
+	echo ""
 done
 
 names=($(cat tmp.txt))
@@ -35,6 +39,6 @@ for name in "${names[@]}"; do
 done
 
 ssh-keygen -R dtn.hpc.nyu.edu
-scp -r -o "StrictHostKeyChecking no" $tmp/ jg8461@dtn.hpc.nyu.edu:/scratch/jg8461/Dengue/folders_for_fit/
+scp -r -o "StrictHostKeyChecking no" tmp/* jg8461@dtn.hpc.nyu.edu:/scratch/jg8461/Dengue/folders_for_fit/
 
 rm -r tmp
