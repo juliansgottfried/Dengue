@@ -1,7 +1,5 @@
 runs=($(ls /scratch/$USER/Dengue/folders_for_fit))
 
-echo "You will be prompted to enter time limits for each run. 90 minutes is a good initial limit."
-
 for i in "${!runs[@]}"; do
     name=${runs[i]}
     read -p "Enter time limit (in minutes) for $name: " run_time 
