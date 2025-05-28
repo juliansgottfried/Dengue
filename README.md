@@ -16,7 +16,7 @@ TO RUN
 
 3. From within the directory on your computer, run "bash upload.sh". Answer the prompts. You will need your cluster password.
 
-4. On the cluster, run "bash Dengue/launch.sh". You will be asked to provide time limits for each run.
+4. On the cluster, run "bash Dengue/launch.sh". You will be asked to provide time limits for each run. 90 minutes is a good initial guess.
 
 5. Once all the runs are finished, run "bash collate.sh".
 
