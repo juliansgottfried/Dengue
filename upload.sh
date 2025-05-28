@@ -26,9 +26,15 @@ done
 
 names=($(cat tmp.txt))
 
+rm tmp.txt
+
+mkdir tmp
+
 for name in "${names[@]}"; do
-	ssh-keygen -R dtn.hpc.nyu.edu
-        scp -r -o "StrictHostKeyChecking no" $name jg8461@dtn.hpc.nyu.edu:/scratch/jg8461/Dengue/folders_for_fit/
+	cp -r $name tmp
 done
 
-rm tmp.txt
+ssh-keygen -R dtn.hpc.nyu.edu
+scp -r -o "StrictHostKeyChecking no" $tmp/ jg8461@dtn.hpc.nyu.edu:/scratch/jg8461/Dengue/folders_for_fit/
+
+rm -r tmp
