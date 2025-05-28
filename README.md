@@ -2,7 +2,7 @@ TO SET UP ENVIRONMENT
 
 On the cluster:
 
-Place the repo into your scratch home directory so that the path to the directory is "scratch/$USER/Dengue/". Renv should activate itself automatically. Run "bash set_up.sh". You will be asked for your email, and you may be asked to grant permission for some action.
+In your scratch home directory, run "git clone https://github.com/juliansgottfried/Dengue.git". Renv should activate itself automatically. Run "bash set_up.sh". You will be asked for your email, and you may be asked to grant permission for some action.
 
 Next, on your computer:
 
