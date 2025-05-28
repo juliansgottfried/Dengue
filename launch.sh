@@ -1,4 +1,4 @@
-runs=($(ls /scratch/$USER/Dengue/folders_for_fit/$USER))
+runs=($(ls /scratch/$USER/Dengue/folders_for_fit))
 
 times=($(cat /scratch/$USER/Dengue/run_times.txt))
 
