@@ -24,6 +24,7 @@ while [[ "$flagger" != "y" ]] ; do
         echo "Printing folder names:"
         echo ""
 	cat tmp.txt
+	echo ""
 	read -p "Are these folder names correct? (y/n): " flagger
 	echo ""
 done
