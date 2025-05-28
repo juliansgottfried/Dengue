@@ -4,9 +4,9 @@ On the cluster:
 
 In your scratch home directory, run "git clone https://github.com/juliansgottfried/Dengue.git". Run "bash Dengue/set_up.sh". You will be asked for your email, and you may be prompted by renv.
 
-Next, on your computer:
+On your computer:
 
-Make a directory to store fitting files and results. Place the files "download.sh" and "upload.sh" inside this directory.
+Make a directory to store fitting files. Download the files "download.sh" and "upload.sh" and place them inside the directory.
 
 TO RUN
 
