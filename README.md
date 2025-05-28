@@ -2,7 +2,7 @@ TO SET UP ENVIRONMENT
 
 On the cluster:
 
-In your scratch home directory, run "git clone https://github.com/juliansgottfried/Dengue.git". Run "bash Dengue/set_up.sh". You will be asked for your email, and you may be prompted by renv.
+In your scratch home directory, run "git clone https://github.com/juliansgottfried/Dengue.git". Change directory to the repo (all subsequent cluster commands will be made from within the repo). Run "bash set_up.sh". You will be prompted for your email.
 
 On your computer:
 
@@ -16,10 +16,10 @@ TO RUN
 
 3. Within the directory on your computer, run "bash upload.sh". Answer the prompts. You will need your cluster password.
 
-4. On the cluster, run "bash Dengue/launch.sh". You will be asked to provide time limits for each run. 90 minutes is a good initial guess.
+4. On the cluster, run "bash launch.sh". You will be asked to provide time limits for each run. 90 minutes is a good initial guess.
 
-5. You will be emailed when each run begins and ends. Once all the runs are finished, run "bash Dengue/collate.sh" on the cluster.
+5. You will be emailed when each run begins and ends. Once all the runs are finished, run "bash collate.sh", on the cluster.
 
 6. Within the directory on your computer, run "bash download.sh". You will need your cluster password. Each run folder in your directory should now contain "results.csv" and "stats.csv". Verify that these files are complete before proceeding with the final step.
 
-7. On the cluster, run "bash Dengue/clean.sh" and press "ENTER" to confirm.
+7. On the cluster, run "bash clean.sh" and press "ENTER" to confirm.
