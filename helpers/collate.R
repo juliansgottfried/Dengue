@@ -9,12 +9,12 @@ print("Ignoring params containing 'X'")
 data<-c("results","stats")
 
 lapply(data,function(type) {
-    print(paste0("data = ",type))
+    print(paste0(toupper(type)))
     paths<-list.files(paste0(path_name,"/out/",type),full.names=T)
     names<-list.files(paste0(path_name,"/out/",type),full.names=F)
 
     map2(paths,names,function(path,name) {
-        print(paste0("name = ",name))
+        print(paste0(name))
         files<-list.files(path,full.names=T)
         accum<-read.csv(files[1])%>%mutate_all(as.numeric)
         for (i in 2:length(files)) {
@@ -23,6 +23,5 @@ lapply(data,function(type) {
 	}
 	accum<-accum%>%select(-contains("X",ignore.case=F))
         write.csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"),row.names=F)
-        print("Success")
     })
 })
