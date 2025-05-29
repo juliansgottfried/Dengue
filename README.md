@@ -6,7 +6,7 @@ In your scratch home directory run "git clone https://github.com/juliansgottfrie
 
 On your computer:
 
-Make a directory to store fitting files. Download the files "download.sh" and "upload.sh" and place them inside the directory.
+Make a directory to store fitting folders. Download the two files inside the repo folder "local_transfer" and place them inside your new directory.
 
 TO RUN
 
