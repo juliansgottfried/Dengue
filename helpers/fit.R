@@ -39,7 +39,7 @@ covariates <- repair_lookup_table(covariates, t_extrap)
 
 pomped <- pomp(
     data = bk %>% select(all_of(data_vars)) %>% na.omit,
-    time = "time",
+    times = "time",
     t0 = with(bk, 2*time[1]-time[2]),
     covar = covariates,
     rprocess = euler(step.fun = rproc, delta.t = 1/365),
