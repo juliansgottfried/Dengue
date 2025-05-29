@@ -1,2 +1,0 @@
-library(pomp)
-print("Success")

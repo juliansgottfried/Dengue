@@ -6,16 +6,16 @@ library(doRNG)
 library(ggtext)
 
 log_name <- Sys.getenv("LOGNAME")
-path_name<-paste0("/scratch/",log_name,"/Dengue/")
+path_name<-paste0("/scratch/",log_name,"/Dengue")
 
 args <- commandArgs(trailingOnly=TRUE)
 n_array <- as.numeric(args[1])
 array_id <- as.numeric(args[2])
 n_cores <- as.numeric(args[3])
 fit_name <- args[4]
-path <- paste0(path_name,"folders_for_fit/",fit_name,"/")
+path <- paste0(path_name,"/folders_for_fit/",fit_name,"/")
 
-source(paste0(path_name,"helpers/helper_function.R"))
+source(paste0(path_name,"/helpers/helper_function.R"))
 
 seed <- 9087235
 set.seed(seed)
@@ -77,6 +77,6 @@ run_fitting(po=pomped,
             parameters=init_vals,
             seed_num=seed,
             rdd1=rdd1,rdd2=rdd2,rdd3=rdd3,
-            result_path=paste0(path_name,"out/results/",fit_name,"/",as.character(array_id),".csv"),
-            log_path=paste0(path_name,"out/log/",fit_name,"/",as.character(array_id),".txt"),
-            stats_path=paste0(path_name,"out/stats/",fit_name,"/",as.character(array_id),".csv"))
+            result_path=paste0(path_name,"/out/results/",fit_name,"/",as.character(array_id),".csv"),
+            log_path=paste0(path_name,"/out/log/",fit_name,"/",as.character(array_id),".txt"),
+            stats_path=paste0(path_name,"/out/stats/",fit_name,"/",as.character(array_id),".csv"))
