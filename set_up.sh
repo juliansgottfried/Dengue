@@ -1,18 +1,18 @@
-mkdir /scratch/$USER/Dengue/out
-mkdir /scratch/$USER/Dengue/out/log
-mkdir /scratch/$USER/Dengue/out/results
-mkdir /scratch/$USER/Dengue/out/stats
-mkdir /scratch/$USER/Dengue/out/output
+mkdir out
+mkdir out/log
+mkdir out/results
+mkdir out/stats
+mkdir out/output
 
-mkdir /scratch/$USER/Dengue/folders_for_fit
+mkdir folders_for_fit
 
 read -p "Enter email: " email_address
-echo "#SBATCH --mail-user=$email_address" > /scratch/$USER/Dengue/helpers/parts/tmp.txt
-cat /scratch/$USER/Dengue/helpers/parts/top.txt /scratch/$USER/Dengue/helpers/parts/tmp.txt /scratch/$USER/Dengue/helpers/parts/bottom.txt > /scratch/$USER/Dengue/helpers/run.slurm
-rm /scratch/$USER/Dengue/helpers/parts/tmp.txt
+echo "#SBATCH --mail-user=$email_address" > helpers/parts/tmp.txt
+cat helpers/parts/top.txt helpers/parts/tmp.txt helpers/parts/bottom.txt > helpers/run.slurm
+rm helpers/parts/tmp.txt
 
 module unload r
 module unload gcc
 module load r/gcc/4.3.1
 
-Rscript /scratch/$USER/Dengue/helpers/init_renv.R
+Rscript helpers/init_renv.R
