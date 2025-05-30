@@ -43,3 +43,5 @@ ssh-keygen -R dtn.hpc.nyu.edu
 scp -r -o "StrictHostKeyChecking no" tmp/* jg8461@dtn.hpc.nyu.edu:/scratch/jg8461/Dengue/folders_for_fit/
 
 rm -r tmp
+
+ssh-keygen -R dtn.hpc.nyu.edu
