@@ -9,5 +9,3 @@ for path in "${paths[@]}"; do
 done
 
 rm -r tmp
-
-ssh-keygen -R dtn.hpc.nyu.edu
