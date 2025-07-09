@@ -2,11 +2,17 @@ TO SET UP ENVIRONMENT
 
 On the cluster:
 
-In your scratch home directory run "git clone https://github.com/juliansgottfried/Dengue.git". Change directory to the repo (all subsequent cluster commands will be made from within the repo). Run "bash set_up.sh". You will be prompted for your email.
+1. In your scratch home directory run "git clone https://github.com/juliansgottfried/Dengue.git". Change directory to the repo (all subsequent cluster commands will be made from within the repo).
+
+2. Run "bash set_up.sh". You will be prompted for your email.
 
 On your computer:
 
-Make a directory to store fitting folders. Download the three files inside the repo folder "local_transfer" and place them inside your new directory. Edit the "user_name" variable in the file "user_name.sh" to be your HPC username.
+1. Make a directory to store fitting folders.
+
+2. Download the three files inside the repo folder "local_transfer" and place them inside your new directory.
+
+3. Edit the "user_name" variable in the file "user_name.sh" to be your HPC username.
 
 TO RUN
 
