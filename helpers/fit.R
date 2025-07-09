@@ -1,9 +1,7 @@
 library(tidyverse)
 library(pomp)
-library(ggridges)
 library(doParallel)
 library(doRNG)
-library(ggtext)
 
 log_name <- Sys.getenv("LOGNAME")
 path_name<-paste0("/scratch/",log_name,"/Dengue")
