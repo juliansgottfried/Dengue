@@ -1,4 +1,4 @@
-TO SET UP ENVIRONMENT
+TO SET UP ENVIRONMENTS
 
 On the cluster:
 
@@ -6,7 +6,7 @@ On the cluster:
 
 2. Run "bash set_up.sh". You will be prompted for your email.
 
-On your computer:
+Next, on your computer:
 
 1. Make a directory to store fitting folders.
 
