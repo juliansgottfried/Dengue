@@ -1,4 +1,4 @@
-source user_name.sh
+source username.sh
 
 mkdir tmp
 ssh-keygen -R dtn.hpc.nyu.edu

@@ -1,4 +1,4 @@
-source user_name.sh
+source username.sh
 
 touch tmp.txt
 
