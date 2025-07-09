@@ -14,6 +14,7 @@ On your computer:
 
 3. Edit the "user_name" variable in the file "user_name.sh" to be your HPC username.
 
+
 TO RUN
 
 1. Within the directory on your computer, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a lowercase letter corresponding to the run.
