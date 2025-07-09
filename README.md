@@ -12,7 +12,7 @@ Next, on your computer:
 
 2. Download the three files inside the repo folder "local_transfer" and place them inside your new directory.
 
-3. Edit the "user_name" variable in the file "user_name.sh" to be your HPC username.
+3. Edit the "user_name" variable in the file "username.sh" to be your HPC username.
 
 
 TO RUN
