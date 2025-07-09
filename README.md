@@ -23,7 +23,7 @@ TO RUN
 
 3. Run "bash upload.sh". Answer the prompts. You will need your cluster password.
 
-4. On the cluster, run "bash launch.sh". You will be asked to provide time limits for each run. 90 minutes is a good initial guess.
+4. On the cluster, run "bash launch.sh". You will be asked to provide a time limit for each run. 90 minutes is a good initial number.
 
 5. You will be emailed when each run begins and ends. Once all the runs are finished, run "bash collate.sh", on the cluster. It's a good idea to record the duration of each run to inform time limits for future runs.
 
