@@ -32,6 +32,6 @@ lapply(data,function(type) {
 		accum<-bind_rows(accum,add)
 	}
 
-        write.csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"),row.names=F)
+        write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
     })
 })
