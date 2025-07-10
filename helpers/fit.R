@@ -28,7 +28,7 @@ pars_path <- paste0(path,"pars.csv")
 if (file.exists(pars_path)) {
         init_vals <- read_csv(pars_path)
 } else {
-	param_bound <- param_bound %>% as.data.frame
+	param_bounds <- param_bounds %>% as.data.frame
 	init_vals <- sobol_design(
 		lower=unlist(param_bound[1,]),
 		upper=unlist(param_bound[2,]),

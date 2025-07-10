@@ -3,8 +3,8 @@ path=/scratch/$LOGNAME/Dengue
 runs=($(ls $path/folders_for_fit))
 
 read -p $'Number of initial parameter combinations:\n(MUST be a multiple of 50, SHOULD be a multiple of 500) ' nseq
-read -p "Time limit (in minutes) for each run: " run_time
-read -p "Number of mif2 refinement runs: " n_refine
+read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess) ' run_time
+read -p $'Number of mif2 refinement runs:\n(no more than 2) ' n_refine
 
 head -n 1 email.sh > line1.sh
 echo "n_refine=$n_refine" > line2.sh
