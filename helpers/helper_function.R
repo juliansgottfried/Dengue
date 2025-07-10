@@ -1,8 +1,10 @@
 run_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
+	n_refine=n_refine,
         result_path,
         log_path,
+	traces_path,
         stats_path) {
     
     cl <- parallel::makeCluster(n_cores)
@@ -21,17 +23,31 @@ run_fitting <- function(
         cat(paste("Starting iteration", i, "\n"),
 		file = log_path,
                 append = TRUE)
-            
+
+	rdds = list(rdd1,rdd2,rdd3)
+
+	Np=1000
+	Nmif=50
+
         mifout <- tryCatch(po |>
-                               mif2(Np = 1000,
-                                    Nmif = 50,
+                               mif2(Np = Np,
+                                    Nmif = Nmif,
                                     cooling.type = "geometric",
                                     cooling.fraction.50 = 0.5,
                                     params = param,
-                                    rw.sd = rdd1) |>
-                               mif2(rw.sd = rdd2) |>
-                               mif2(rw.sd = rdd3),
+                                    rw.sd = rdds[[1]]),
                            error = function(e) e)
+
+	traces <- data.frame(mifout@traces,iter=0:Nmif,run=1)
+
+	for (j in 1:n_refine) {
+		mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+		traces_j <- data.frame(mifout@traces,iter=0:Nmif,run=j+1)
+		traces <- bind_rows(traces,traces_j)
+	}
+	if (file.exists(traces_path)) {
+            read.csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+        } else write.csv(traces,traces_path)
 
         stats <- data.frame(cond=mifout@cond.logLik,
                             eff=mifout@eff.sample.size,

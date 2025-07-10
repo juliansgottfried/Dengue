@@ -1,27 +1,37 @@
-library(dplyr)
-library(purrr)
+library(tidyverse)
 
 log_name<-Sys.getenv("LOGNAME")
 path_name<-paste0("/scratch/",log_name,"/Dengue")
 
-print("Ignoring params containing 'X'")
+data<-c("results","traces","stats")
 
-data<-c("results","stats")
+process<-function(path) {
+	read_csv(path) %>%
+		select(matches(c("sample",par_names,"loglik","loglik.se","flag",
+			"time","cond","eff",
+			"iter","run"))) %>%
+		mutate_all(as.numeric)
+	}
 
 lapply(data,function(type) {
     print(paste0(toupper(type)))
+
     paths<-list.files(paste0(path_name,"/out/",type),full.names=T)
     names<-list.files(paste0(path_name,"/out/",type),full.names=F)
 
     map2(paths,names,function(path,name) {
         print(paste0(name))
+
+	source(paste0(path,"object.R"))
+
         files<-list.files(path,full.names=T)
-        accum<-read.csv(files[1])%>%mutate_all(as.numeric)
+        accum<-process(files[1])
+
         for (i in 2:length(files)) {
-		add<-read.csv(files[i])%>%mutate_all(as.numeric)
+		add<-process(files[i])
 		accum<-bind_rows(accum,add)
 	}
-	accum<-accum%>%select(-contains("X",ignore.case=F))
+
         write.csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"),row.names=F)
     })
 })

@@ -7,7 +7,7 @@ scp -r -o "StrictHostKeyChecking no" $user_name@dtn.hpc.nyu.edu:/scratch/$user_n
 paths=(tmp/*)
 for path in "${paths[@]}"; do
 	name=$(echo $path | awk -F/ '{print $NF}')
-        mv $path/results.csv $path/stats.csv $name
+        mv $path/results.csv $path/stats.csv $path/traces.csv $name
 done
 
 rm -r tmp
