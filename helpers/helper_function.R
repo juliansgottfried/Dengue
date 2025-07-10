@@ -26,11 +26,9 @@ run_fitting <- function(
 
 	rdds = list(rdd1,rdd2,rdd3)
 
-	Np=1000
 	Nmif=50
-
         mifout <- tryCatch(po |>
-                               mif2(Np = Np,
+                               mif2(Np = 1000,
                                     Nmif = Nmif,
                                     cooling.type = "geometric",
                                     cooling.fraction.50 = 0.5,

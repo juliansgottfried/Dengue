@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --partition=cs
+#SBATCH --array=1-50
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=10GB
@@ -19,4 +20,5 @@ Rscript $path/helpers/fit.R \
     $SLURM_ARRAY_TASK_ID \
     $SLURM_NTASKS_PER_NODE \
     $SLURM_JOB_NAME \
-    $n_refine
+    $n_refine \
+    $nseq
