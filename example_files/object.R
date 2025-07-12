@@ -53,6 +53,10 @@ logit_transf <- c("rho")
 
 barycentric_transf <- c("S_0","I_0","R_0")
 
+data_vars <- c("time","cases")
+
+covars <- c("time","pop","dpopdt")
+
 param_bounds <- list(
     delta=c(1/60,1/60),
     beta=c(5,20),
@@ -62,7 +66,3 @@ param_bounds <- list(
     I_0=c(0,0.01),
     R_0=c(0,0.4),
     sigma=c(0.01,0.1))
-
-data_vars <- c("time","cases")
-
-covars <- c("time","pop","dpopdt")
