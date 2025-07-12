@@ -12,7 +12,7 @@ mv tmp/summary.csv tmp_summary.csv
 paths=(tmp/*)
 for path in "${paths[@]}"; do
 	name=$(echo $path | awk -F/ '{print $NF}')
-        mv $path/results.csv $path/stats.csv $path/traces.csv $name
+        mv $path/* $name
 done
 
 rm -r tmp

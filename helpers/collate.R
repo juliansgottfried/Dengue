@@ -3,8 +3,6 @@ library(tidyverse)
 log_name <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/",log_name,"/Dengue")
 
-data <- c("results","traces","stats")
-
 time_df = read.table(paste0(path_name,"/times.txt"),sep=" ") |> 
     t() |> 
     na.omit() |> 
@@ -37,7 +35,9 @@ pars_path <- paste0(path,"pars.csv")
 init_vals <- read_csv(pars_path)
 est_pars <- par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0]
 
-lapply(data,function(type) {
+result_type <- c("results","traces","stats")
+
+lapply(result_type,function(type) {
     print(paste0(toupper(type)))
 
     paths<-list.files(paste0(path_name,"/out/",type),full.names=T)
@@ -45,11 +45,6 @@ lapply(data,function(type) {
 
     map2(paths,names,function(path,name) {
         print(paste0(name))
-
-	source(paste0(path,"object.R"))
-	
-	init_vals <- read_csv(paste0(path,"pars.csv"))
-	k <- length(par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0])
 
         files<-list.files(path,full.names=T)
         accum<-process(files[1])
@@ -60,17 +55,23 @@ lapply(data,function(type) {
 	}
 
 	if (type=="results") {
+		source(paste0(path,"object.R"))
+		init_vals <- read_csv(paste0(path,"pars.csv"))
+
+		k <- length(par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0])
 		maxlik <- accum %>% arrange(-loglik) %>% pull(loglik) %>% head(1)
 		aic <- 2*(k-maxlik)
 		time <- time_df %>% filter(name==name) %>% pull(time)
+		
 		current <- c(name,time,maxlik,k,aic)
 		names(current) <- names(summary_data)
-		summary_data <- bind_rows(summary_data,current)	
-	}
 
-	summary_data <- summary_data %>% na.omit(cols=run)
-	write_csv(summary_data,paste0(path_name,"/summary.csv"))
+		summary_data <- bind_rows(summary_data,current)	
+		summary_data <- summary_data %>% na.omit(cols=run)
+	}
 
         write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
     })
 })
+
+write_csv(summary_data,paste0(path_name,"/summary.csv"))
