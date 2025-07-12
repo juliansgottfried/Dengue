@@ -1,9 +1,25 @@
 library(tidyverse)
 
-log_name<-Sys.getenv("LOGNAME")
-path_name<-paste0("/scratch/",log_name,"/Dengue")
+log_name <- Sys.getenv("LOGNAME")
+path_name <- paste0("/scratch/",log_name,"/Dengue")
 
-data<-c("results","traces","stats")
+data <- c("results","traces","stats")
+
+time_df = read.table(paste0(path_name,"/times.txt"),sep=" ") |> 
+    t() |> 
+    na.omit() |> 
+    t() |> 
+    data.frame()
+colnames(time_df)=c("time","name")
+
+time_df=time_df |>
+    mutate(time=hms(time)) |>
+    mutate(hours=hour(time),minutes=minute(time)) |>
+    mutate(time=hours*60+minutes) |>
+    select(-c(hours,minutes)) |>
+    group_by(name) |>
+    summarize(time=max(time)) |>
+    ungroup()
 
 process<-function(path) {
 	read_csv(path) %>%
@@ -46,13 +62,14 @@ lapply(data,function(type) {
 	if (type=="results") {
 		maxlik <- accum %>% arrange(-loglik) %>% pull(loglik) %>% head(1)
 		aic <- 2*(k-maxlik)
-		current <- c(name,NA,maxlik,k,aic)
+		time <- time_df %>% filter(name==name) %>% pull(time)
+		current <- c(name,time,maxlik,k,aic)
 		names(current) <- names(summary_data)
 		summary_data <- bind_rows(summary_data,current)	
 	}
 
 	summary_data <- summary_data %>% na.omit(cols=run)
-	write_csv(summary_data,paste0(path_name,"/folders_for_fit/summary.csv"))
+	write_csv(summary_data,paste0(path_name,"/summary.csv"))
 
         write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
     })
