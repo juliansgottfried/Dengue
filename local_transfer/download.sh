@@ -7,7 +7,7 @@ scp -r -o "StrictHostKeyChecking no" \
 	$user_name@dtn.hpc.nyu.edu:/scratch/$user_name/Dengue/summary.csv \
 	tmp/
 
-mv tmp/summary.csv .
+mv tmp/summary.csv tmp_summary.csv
 
 paths=(tmp/*)
 for path in "${paths[@]}"; do
@@ -16,3 +16,6 @@ for path in "${paths[@]}"; do
 done
 
 rm -r tmp
+
+Rscript bind_summary.R
+rm tmp_summary.csv
