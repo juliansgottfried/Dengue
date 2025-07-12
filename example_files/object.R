@@ -66,14 +66,3 @@ param_bounds <- list(
 data_vars <- c("time","cases")
 
 covars <- c("time","pop","dpopdt")
-
-
-
-df <- data.frame(year=rep(2000:2004,each=12),month=rep(1:12,5))
-df$time <- df$year+df$month/12
-df$cases <- 10*(1+sin(2*pi*(0.5+df$time)))
-df$pop <- 1000*exp(0.5*(df$time-2000))
-df$dpopdt <- df$pop*(0.5)
-
-df <- df %>% select(-c(year,month))
-write_csv(df,"/Users/juliangottfried/Desktop/example_files/dataset.csv")
