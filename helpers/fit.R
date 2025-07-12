@@ -30,8 +30,8 @@ if (file.exists(pars_path)) {
 } else {
 	param_bounds <- param_bounds %>% as.data.frame
 	init_vals <- sobol_design(
-		lower=unlist(param_bound[1,]),
-		upper=unlist(param_bound[2,]),
+		lower=unlist(param_bounds[1,]),
+		upper=unlist(param_bounds[2,]),
 		nseq=nseq)
 	write_csv(init_vals,pars_path)
 }
