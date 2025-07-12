@@ -53,9 +53,7 @@ logit_transf <- c("rho")
 
 barycentric_transf <- c("S_0","I_0","R_0")
 
-data_vars <- c("time","cases")
-
-covars <- c("time","pop","dpopdt")
+obs_vars <- "cases" 
 
 param_bounds <- list(
     delta=c(1/60,1/60),

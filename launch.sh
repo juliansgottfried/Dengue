@@ -6,11 +6,11 @@ read -p $'Number of initial parameter combinations:\n(MUST be a multiple of 50, 
 read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess) ' run_time
 read -p $'Number of mif2 refinement runs:\n(no more than 2) ' n_refine
 
-head -n 1 email.sh > line1.sh
-echo "n_refine=$n_refine" > line2.sh
-echo "nseq=$nseq" > line3.sh
-cat line*.sh > email.sh
-rm line*.sh
+head -n 1 $path/helpers/email.sh > $path/helpers/line1.sh
+echo "n_refine=$n_refine" > $path/helpers/line2.sh
+echo "nseq=$nseq" > $path/helpers/line3.sh
+cat $path/helpers/line*.sh > $path/helpers/email.sh
+rm $path/helpers/line*.sh
 
 source $path/helpers/email.sh
 

@@ -46,14 +46,13 @@ if (file.exists(legacy_path)) {
 	df <- read_csv(modern_path,show_col_types=FALSE)
 }
 
-covariates <- covariate_table(
-    df %>% select(all_of(covars)),
-    times = "time")
+covariates <- df %>% select(-all_of(obs_vars))
+covariates <- covariate_table(covariates, times = "time")
 t_extrap <- with(df, c(2 * time[1] - time[2], time))
 covariates <- repair_lookup_table(covariates, t_extrap)
 
 po <- pomp(
-    data = df %>% select(all_of(data_vars)) %>% na.omit,
+    data = df %>% select(all_of(obs_vars)) %>% na.omit,
     times = "time",
     t0 = with(df, 2*time[1]-time[2]),
     covar = covariates,
