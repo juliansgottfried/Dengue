@@ -1,29 +1,28 @@
-TO SET UP ENVIRONMENTS
+## To set up environments
 
-On the cluster:
+### On the cluster:
 
-1. In your scratch home directory run "git clone https://github.com/juliansgottfried/Dengue.git". Change directory to the repo (all subsequent cluster commands will be made from within the repo).
+Run the following lines:
+```
+cd /scratch/$LOGNAME
+git clone https://github.com/juliansgottfried/Dengue.git
+cd Dengue
+bash set_up.sh
+```
+You will be prompted for your email. All subsequent cluster commands should be made from within the Dengue repo.
 
-2. Run "bash set_up.sh". You will be prompted for your email.
+### On your computer:
 
-Next, on your computer:
-
-1. Make a new directory, and navigate into it from the command line (all subsequent computer commands will be made from within this directory).
-
-2. Run the following lines to download and place requisite files:
-
+Make a new directory. From within the directory, run the following lines to download necessary files:
 ```
 curl -o upload.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/upload.sh
 curl -o download.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/download.sh
 curl -o username.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/username.sh
 curl -o bind.R https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/bind.R
-mkdir helpers
+mkdir helpers fitting_folders
 mv bind.R username.sh helpers
 ```
-
-3. Edit the "user_name" variable in the file "helpers/username.sh" to be your HPC username.
-
-4. Make a new folder within this directory, and name it "fitting_folders".
+Edit the "user_name" variable in the file "helpers/username.sh" to be your HPC username.
 
 TO RUN FITTING
 
