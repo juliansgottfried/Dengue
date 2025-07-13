@@ -1,7 +1,7 @@
 run_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
-	n_refine=n_refine,
+	n_refine,
         result_path,
         log_path,
 	traces_path,

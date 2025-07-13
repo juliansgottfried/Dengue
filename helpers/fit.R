@@ -12,8 +12,8 @@ n_array <- as.numeric(args[1])
 array_id <- as.numeric(args[2])
 n_cores <- as.numeric(args[3])
 fit_name <- args[4]
-n_refine <- args[5]
-nseq <- args[6]
+n_refine <- as.numeric(args[5])
+nseq <- as.numeric(args[6])
 
 log_name <- Sys.getenv("LOGNAME")
 
@@ -39,11 +39,11 @@ if (file.exists(pars_path)) {
 est_pars <- par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0]
 
 legacy_path <- paste0(path,"bk_df.csv")
-modern_path <- paste0(path,"dataset.csv")
+current_path <- paste0(path,"dataset.csv")
 if (file.exists(legacy_path)) {
 	df <- read_csv(legacy_path,show_col_types=FALSE)
 } else {
-	df <- read_csv(modern_path,show_col_types=FALSE)
+	df <- read_csv(current_path,show_col_types=FALSE)
 }
 
 covariates <- df %>% select(-all_of(obs_vars))
