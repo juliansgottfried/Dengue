@@ -1,6 +1,6 @@
 ## To set up environments
 
-### On the cluster:
+### On the cluster
 
 Run the following lines:
 ```
@@ -11,7 +11,7 @@ bash set_up.sh
 ```
 You will be prompted for your email. All subsequent cluster commands should be made from within the Dengue repo.
 
-### On your computer:
+### On your computer
 
 Make a new directory. From within the directory, run the following line:
 ```
@@ -19,7 +19,7 @@ bash <(curl -s https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/he
 ```
 All subsequent computer commands should be made from within this directory.
 
-TO RUN FITTING
+## To run fitting
 
 1. Within the folder "fitting_folders" in your computer directory, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a lowercase letter identifying each run. Sequences of runs should have contiguous identifying letters.
 
