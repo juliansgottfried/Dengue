@@ -4,7 +4,7 @@ runs=($(ls $path/folders_for_fit))
 
 read -p $'Number of initial parameter combinations:\n(MUST be a multiple of 50, SHOULD be a multiple of 500) ' nseq
 read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess) ' run_time
-read -p $'Number of mif2 refinement runs:\n(no more than 2) ' n_refine
+read -p $'Number of mif2 refinement runs:\n(0, 1, or 2) ' n_refine
 
 head -n 1 $path/helpers/email.sh > $path/helpers/line1.sh
 echo "n_refine=$n_refine" > $path/helpers/line2.sh
