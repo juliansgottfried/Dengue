@@ -17,6 +17,7 @@ Make a new directory. From within the directory, run the following line:
 ```
 bash <(curl -s https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/set_up.sh)
 ```
+All subsequent computer commands should be made from within this directory.
 
 TO RUN FITTING
 
