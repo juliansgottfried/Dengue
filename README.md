@@ -25,14 +25,14 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 2. Inside each folder, place a data file "dataset.csv" and an object file "object.R". See the files within "example_files" for minimal examples.
 
-3. Run 'bash upload.sh'. Answer the prompts. You will need your cluster password.
+3. Run `bash upload.sh`. Answer the prompts. You will need your cluster password.
 
-4. On the cluster, run 'bash launch.sh'. Answer the prompts. You will be emailed when each run begins and ends.
+4. On the cluster, run `bash launch.sh`. Answer the prompts. You will be emailed when each run begins and ends.
 
-5. Once all the runs are finished, run 'bash collate.sh' on the cluster.
+5. Once all the runs are finished, run `bash collate.sh` on the cluster.
 
-6. On your computer, run 'bash download.sh'. You will need your cluster password.
+6. On your computer, run `bash download.sh`. You will need your cluster password.
 
 7. Each fitting folder in your directory should now contain "results.csv", "stats.csv", "traces.csv", "pars.csv", and "plot.png". Additionally, your main directory should now contain the file "summary.csv". Verify that these files are complete before proceeding with the final step.
 
-8. On the cluster, run 'bash clean.sh' and press 'ENTER' to confirm.
+8. On the cluster, run `bash clean.sh` and press 'ENTER' to confirm.
