@@ -2,10 +2,14 @@ oldw <- getOption("warn")
 options(warn = -1)
 
 suppressMessages(library(tidyverse))
+suppressMessages(library(ggdist))
+suppressMessages(library(ggnewscale))
 suppressMessages(library(pomp))
 
 log_name <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/",log_name,"/Dengue")
+
+source(paste0(path_name,"/helpers/helper_functions.R"))
 
 time_df = read.table(paste0(path_name,"/times.txt"),sep=" ") |> 
     t() |> 
@@ -42,7 +46,8 @@ summary <- lapply(result_type,function(type) {
     summary <- map2(paths,names,function(path,name) {
         print(paste0(name))
 
-	source(paste0(path_name,"/folders_for_fit/",name,"/object.R"))
+	fitting_folder_path <- paste0(path_name,"/folders_for_fit/",name,"/")
+	source(paste0(fitting_folder_path,"object.R"))
 
         files<-list.files(path,full.names=T)
         accum<-process(files[1],par_names)
@@ -55,13 +60,18 @@ summary <- lapply(result_type,function(type) {
 	summary=NULL
 	if (type=="results") {
 		accum <- accum %>% arrange(-loglik)
-		init_vals <- read_csv(paste0(path_name,"/folders_for_fit/",name,"/pars.csv"),show_col_types=F)
+		init_vals <- read_csv(paste0(fitting_folder_path,"pars.csv"),show_col_types=F)
 		k <- length(par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0])
 		maxlik <- accum %>% pull(loglik) %>% head(1)
 		aic <- 2*(k-maxlik)
 		time <- time_df %>% filter(run==name) %>% pull(time)
-		
+				
 		summary <- c(run=name,time=time,loglik=maxlik,k=k,aic=aic)
+		
+		mle <- accum %>% select(all_of(par_names)) %>% slice(1)
+		
+		print("(saving simulation plot)")
+		make_plot(fitting_folder_path,mle)
 	}
 	
         write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
@@ -70,7 +80,7 @@ summary <- lapply(result_type,function(type) {
     return(summary)
 })
 
-summary_data <- bind_rows(summary)
+summary_data <- bind_rows(summary[[1]])
 write_csv(summary_data,paste0(path_name,"/folders_for_fit/summary.csv"))
 
 options(warn = oldw)

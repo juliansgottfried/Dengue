@@ -1,3 +1,34 @@
+construct_pomp <- function(path) {
+	source(paste0(path,"object.R"))
+
+	df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+
+	covariates <- df %>% select(-all_of(obs_vars))
+	covariates <- covariate_table(covariates, times = "time")
+	t_extrap <- with(df, c(2 * time[1] - time[2], time))
+	covariates <- repair_lookup_table(covariates, t_extrap)
+
+	po <- pomp(
+		data = df %>% select(time,all_of(obs_vars)) %>% na.omit,
+		times = "time",
+		t0 = with(df, 2*time[1]-time[2]),
+		covar = covariates,
+		rprocess = euler(step.fun = rproc, delta.t = 1/365),
+		rmeasure = rmeas,
+		dmeasure = dmeas,
+		rinit = rinit,
+		paramnames = par_names,
+		partrans = parameter_trans(
+			log = log_transf,
+			logit = logit_transf,
+			barycentric = barycentric_transf),
+		accumvars = accum_names,
+		statenames = c(accum_names,state_names),
+		verbose = F)
+	
+	return(po)
+}
+
 run_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
@@ -98,4 +129,84 @@ run_fitting <- function(
     
     stopCluster(cl)
     return(r1)
+}
+
+make_plot <- function(path,mle) {
+	po <- construct_pomp(path)
+	coef(po,names(mle)) <- mle
+
+	df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	
+	sims <- po %>% simulate(nsim=1000,
+				include.data=TRUE,
+				format="data.frame")
+
+	set_0 <- function(x) (ifelse(is.na(x),0,x))
+	sims_cases <- sims %>% 
+		select(time,.id,all_of(obs_vars)) %>%
+		mutate(.id=ifelse(.id=="data","data","sim")) %>% 
+		mutate_at(obs_vars,set_0)
+
+	enso_bounds <- df %>% 
+		filter(!is.na(cases)) %>% 
+		mutate(enso=nino+nina) %>% 
+		select(time,enso) %>% 
+		mutate(upper=sims_cases %>% 
+			filter(.id!="data") %>% 
+			group_by(time) %>% 
+			summarize(upper=quantile(cases,0.95)) %>% 
+			pull(upper))
+	
+	fill_colors <- c("black","#40d6ed")
+	color_colors <- c("black","#16a4ba")
+	labels <- c("Data","Simulation")
+	bg.color <- "#e6e6e6"
+	bg.color <- "white"
+
+	plotter <- ggplot() +
+		ggdist::stat_lineribbon(data=sims_cases,
+					mapping=aes(x=time,
+						y=cases,
+						color=.id,
+						fill=.id),
+					.width = c(0.1,0.9),
+					alpha=0.65,
+					linewidth=0.8)+
+		labs(x="Year",
+			y="Cases",
+			title="Dengue in Thailand")+
+		scale_fill_manual(values=fill_colors,
+				labels=labels)+
+		scale_color_manual(values=color_colors,
+				labels=labels)+
+		guides(color="none",
+			fill=guide_legend(title=""))+
+		new_scale_fill()+
+		geom_rect(data=enso_bounds,
+			mapping=aes(xmin=time,
+				xmax=time+1/12,
+				ymin=upper,
+				ymax=Inf,
+				fill=enso),
+			alpha=0.45,
+			inherit.aes=F)+
+		scale_fill_gradient2(low="#f2c51f",
+			mid=bg.color,
+                        high="#f54997",
+                        name="ENSO")+
+		theme_classic()+
+		theme(legend.position="bottom",
+			legend.title=element_text(size=10,vjust=0.8),
+			text=element_text(size = 14),
+			legend.background=element_rect(fill=bg.color,color=bg.color),
+			panel.background=element_rect(fill=bg.color,color=bg.color),
+			plot.background=element_rect(fill=bg.color,color=bg.color))+
+		ylim(0,5000)
+
+	ggsave(filename="plot.png",
+		plot = plotter,
+		path = path,
+		width = 12,
+		height = 6,
+		units = "in") %>% suppressWarnings()
 }

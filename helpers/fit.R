@@ -16,59 +16,22 @@ n_refine <- as.numeric(args[5])
 nseq <- as.numeric(args[6])
 
 log_name <- Sys.getenv("LOGNAME")
-
 repo_path<-paste0("/scratch/",log_name,"/Dengue")
 path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
-source(paste0(repo_path,"/helpers/helper_function.R"))
-
+source(paste0(repo_path,"/helpers/helper_functions.R"))
 source(paste0(path,"object.R"))
 
-pars_path <- paste0(path,"pars.csv")
-if (file.exists(pars_path)) {
-        init_vals <- read_csv(pars_path)
-} else {
-	param_bounds <- param_bounds %>% as.data.frame
-	init_vals <- sobol_design(
-		lower=unlist(param_bounds[1,]),
-		upper=unlist(param_bounds[2,]),
-		nseq=nseq)
-	write_csv(init_vals,pars_path)
-}
+po <- construct_pomp(path)
+
+param_bounds <- param_bounds %>% as.data.frame
+init_vals <- sobol_design(
+	lower=unlist(param_bounds[1,]),
+	upper=unlist(param_bounds[2,]),
+	nseq=nseq)
+write_csv(init_vals,paste0(path,"pars.csv"))
 
 est_pars <- par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0]
-
-legacy_path <- paste0(path,"bk_df.csv")
-current_path <- paste0(path,"dataset.csv")
-if (file.exists(legacy_path)) {
-	df <- read_csv(legacy_path,show_col_types=FALSE)
-} else {
-	df <- read_csv(current_path,show_col_types=FALSE)
-}
-
-covariates <- df %>% select(-all_of(obs_vars))
-covariates <- covariate_table(covariates, times = "time")
-t_extrap <- with(df, c(2 * time[1] - time[2], time))
-covariates <- repair_lookup_table(covariates, t_extrap)
-
-po <- pomp(
-    data = df %>% select(time,all_of(obs_vars)) %>% na.omit,
-    times = "time",
-    t0 = with(df, 2*time[1]-time[2]),
-    covar = covariates,
-    rprocess = euler(step.fun = rproc, delta.t = 1/365),
-    rmeasure = rmeas,
-    dmeasure = dmeas,
-    rinit = rinit,
-    paramnames = par_names,
-    partrans = parameter_trans(
-        log = log_transf,
-        logit = logit_transf,
-        barycentric = barycentric_transf
-        ),
-    accumvars = accum_names,
-    statenames = c(accum_names,state_names),
-    verbose = TRUE)
 
 len <- nseq/n_array
 init_vals <- init_vals[((array_id-1)*len+1):(array_id*len),]
