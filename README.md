@@ -37,9 +37,9 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 **On your computer:**
 
-6. Run `bash download.sh`. You will need your HPC password.
+6. Run `bash download.sh`. You will need your HPC password. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, and `plot.png`. Additionally, your main directory should now contain the file `summary.csv`.
 
-7. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, and `plot.png`. Additionally, your main directory should now contain the file `summary.csv`. Verify that these files are complete before proceeding with the final step.
+7. Verify that these files are complete before proceeding with the final step.
 
 **On the cluster:**
 
