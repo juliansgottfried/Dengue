@@ -16,7 +16,7 @@ Next, on your computer:
 
 TO RUN
 
-1. Within the directory on your computer, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a lowercase letter corresponding to the run. Sequences of runs should have contiguous identifying letters.
+1. Within the directory on your computer, create a folder for each fitting run. Name each folder "run_month\_day\_x", where "x" is a lowercase letter identifying each run. Sequences of runs should have contiguous identifying letters.
 
 2. Inside each folder place a data file "dataset.csv" and an object file "object.R". See the files within "example_files" for minimal examples.
 
