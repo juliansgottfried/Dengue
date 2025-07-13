@@ -1,4 +1,4 @@
-source helpers/username.sh
+source username.sh
 
 touch tmp.txt
 
