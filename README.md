@@ -21,18 +21,26 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 ## To run fitting
 
-1. Within the folder `fitting_folders` in your computer directory, create a folder for each fitting run. Name each folder `run_month\_day\_x`, where `x` is a lowercase letter identifying each run. Sequences of runs should have contiguous identifying letters.
+**On your computer:**
 
-2. Inside each folder, place a data file "dataset.csv" and an object file "object.R". See the files within "example_files" for minimal examples.
+1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_month_day_x`, where `x` is a lowercase letter identifying each run. Sequences of runs should have contiguous identifying letters.
 
-3. Run `bash upload.sh`. Answer the prompts. You will need your cluster password.
+2. Inside each folder, place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files` for minimal examples.
 
-4. On the cluster, run `bash launch.sh`. Answer the prompts. You will be emailed when each run begins and ends.
+3. Run `bash upload.sh`. Answer the prompts. You will need your HPC password.
 
-5. Once all the runs are finished, run `bash collate.sh` on the cluster.
+**On the cluster:**
 
-6. On your computer, run `bash download.sh`. You will need your cluster password.
+4. Run `bash launch.sh`. Answer the prompts. You will be emailed when each run begins and ends.
 
-7. Each fitting folder in your directory should now contain "results.csv", "stats.csv", "traces.csv", "pars.csv", and "plot.png". Additionally, your main directory should now contain the file "summary.csv". Verify that these files are complete before proceeding with the final step.
+5. Once all the runs are finished, run `bash collate.sh`.
 
-8. On the cluster, run `bash clean.sh` and press 'ENTER' to confirm.
+**On your computer:**
+
+6. Run `bash download.sh`. You will need your HPC password.
+
+7. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, and `plot.png`. Additionally, your main directory should now contain the file `summary.csv`. Verify that these files are complete before proceeding with the final step.
+
+**On the cluster:**
+
+8. Run `bash clean.sh` and press `ENTER` to confirm.
