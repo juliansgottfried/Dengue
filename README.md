@@ -28,6 +28,6 @@ TO RUN
 
 6. On your computer, run "bash download.sh". You will need your cluster password.
 
-7. Each run folder in your directory should now contain "results.csv", "stats.csv", "traces.csv", "pars.csv", and "plot.png". Additionally, your directory should now contain the file "summary.csv". Verify that these files are complete before proceeding with the final step.
+7. Each fitting folder in your directory should now contain "results.csv", "stats.csv", "traces.csv", "pars.csv", and "plot.png". Additionally, your directory should now contain the file "summary.csv". Verify that these files are complete before proceeding with the final step.
 
 8. On the cluster, run "bash clean.sh" and press "ENTER" to confirm.
