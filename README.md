@@ -13,10 +13,15 @@ Next, on your computer:
 2. Run the following lines to download and place requisite files:
 
 curl -o upload.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/upload.sh
+
 curl -o download.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/download.sh
+
 curl -o username.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/username.sh
+
 curl -o bind.R https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/bind.R
+
 mkdir helpers
+
 mv bind.R username.sh helpers
 
 3. Edit the "user_name" variable in the file "helpers/username.sh" to be your HPC username.
