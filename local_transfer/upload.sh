@@ -37,7 +37,7 @@ rm tmp.txt
 mkdir tmp
 
 for name in "${names[@]}"; do
-	cp -r $name tmp
+	cp -r fitting_folders/$name tmp
 done
 
 ssh-keygen -R dtn.hpc.nyu.edu

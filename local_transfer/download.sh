@@ -11,7 +11,7 @@ mv tmp/summary.csv tmp_summary.csv
 paths=(tmp/*)
 for path in "${paths[@]}"; do
 	name=$(echo $path | awk -F/ '{print $NF}')
-        mv $path/* $name
+        mv $path/* fitting_folders/$name
 done
 
 rm -r tmp
