@@ -25,7 +25,7 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_month_day_x`, where `x` is a lowercase letter identifying each run. Sequences of runs should have contiguous identifying letters.
 
-2. Inside each folder, place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files` for minimal examples.
+2. Inside each folder, place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files`.
 
 3. Run `bash upload.sh`. Answer the prompts. You will need your HPC password.
 
