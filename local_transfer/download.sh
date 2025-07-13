@@ -1,4 +1,4 @@
-source username.sh
+source helpers/username.sh
 
 mkdir tmp
 ssh-keygen -R dtn.hpc.nyu.edu
@@ -16,5 +16,5 @@ done
 
 rm -r tmp
 
-Rscript bind.R
+Rscript helpers/bind.R
 rm tmp_summary.csv
