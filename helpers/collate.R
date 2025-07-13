@@ -54,9 +54,10 @@ summary <- lapply(result_type,function(type) {
 	
 	summary=NULL
 	if (type=="results") {
+		accum <- accum %>% arrange(-loglik)
 		init_vals <- read_csv(paste0(path_name,"/folders_for_fit/",name,"/pars.csv"),show_col_types=F)
 		k <- length(par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0])
-		maxlik <- accum %>% arrange(-loglik) %>% pull(loglik) %>% head(1)
+		maxlik <- accum %>% pull(loglik) %>% head(1)
 		aic <- 2*(k-maxlik)
 		time <- time_df %>% filter(run==name) %>% pull(time)
 		
