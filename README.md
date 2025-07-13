@@ -13,16 +13,10 @@ You will be prompted for your email. All subsequent cluster commands should be m
 
 ### On your computer:
 
-Make a new directory. From within the directory, run the following lines to download necessary files:
+Make a new directory. From within the directory, run the following line:
 ```
-curl -o upload.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/upload.sh
-curl -o download.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/download.sh
-curl -o username.sh https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/username.sh
-curl -o bind.R https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/bind.R
-mkdir helpers fitting_folders
-mv bind.R username.sh helpers
+bash <(curl -s https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/set_up.sh)
 ```
-Edit the "user_name" variable in the file "helpers/username.sh" to be your HPC username.
 
 TO RUN FITTING
 
