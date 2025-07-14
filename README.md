@@ -1,4 +1,4 @@
-## To set up environments
+## To set up directories
 
 ### On the cluster
 
