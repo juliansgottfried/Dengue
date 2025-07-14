@@ -43,4 +43,4 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 **On the cluster:**
 
-8. Run `bash clean.sh` and press `ENTER` to confirm.
+8. Run `bash clean.sh` and press `Enter` to confirm.
