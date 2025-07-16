@@ -38,7 +38,7 @@ process<-function(path,par_names) {
 	}
 
 result_type <- c("results","traces","stats")
-if (isPanel) result_type <- c("results_wide",result_type)
+if (isPanel) result_type <- c("results_long",result_type)
 
 summary <- lapply(result_type,function(type) {
     print(paste0(toupper(type)))
