@@ -3,6 +3,7 @@ path=/scratch/$LOGNAME/Dengue
 mkdir $path/out
 mkdir $path/out/log
 mkdir $path/out/results
+mkdir $path/out/results_long
 mkdir $path/out/stats
 mkdir $path/out/traces
 mkdir $path/out/output

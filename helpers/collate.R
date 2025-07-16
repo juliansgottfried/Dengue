@@ -6,6 +6,8 @@ suppressMessages(library(ggdist))
 suppressMessages(library(ggnewscale))
 suppressMessages(library(pomp))
 
+isPanel <- args[1]
+
 log_name <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/",log_name,"/Dengue")
 
@@ -29,13 +31,14 @@ time_df=time_df |>
 
 process<-function(path,par_names) {
 	read_csv(path) %>%
-		select(matches(c("sample",par_names,"loglik","loglik.se","flag",
+		select(contains(c("sample","unit",par_names,"loglik","loglik.se","flag",
 			"time","cond","eff",
 			"iter","run"))) %>%
 		mutate_all(as.numeric) %>% suppressMessages()
 	}
 
 result_type <- c("results","traces","stats")
+if (isPanel) result_type <- c("results_wide",result_type)
 
 summary <- lapply(result_type,function(type) {
     print(paste0(toupper(type)))
@@ -61,17 +64,21 @@ summary <- lapply(result_type,function(type) {
 	if (type=="results") {
 		accum <- accum %>% arrange(-loglik)
 		init_vals <- read_csv(paste0(fitting_folder_path,"pars.csv"),show_col_types=F)
-		k <- length(par_names[apply(init_vals,2,function(x) {max(x)-min(x)})!=0])
+
+		k <- sum(apply(init_vals,2,\(.) diff(range(.)))!=0)
 		maxlik <- accum %>% pull(loglik) %>% head(1)
 		aic <- 2*(k-maxlik)
 		time <- time_df %>% filter(run==name) %>% pull(time)
 				
 		summary <- c(run=name,time=time,loglik=maxlik,k=k,aic=aic)
 		
-		mle <- accum %>% select(all_of(par_names)) %>% slice(1)
+		mle <- accum %>% slice(1)
 		
 		print("(saving simulation plot)")
-		make_plot(fitting_folder_path,mle)
+
+		if (isPanel) {
+			make_panel_plot(fitting_folder_path,mle,T)
+		} else make_plot(fitting_folder_path,mle,T)
 	}
 	
         write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))

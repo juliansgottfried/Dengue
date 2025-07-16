@@ -15,7 +15,13 @@ module unload r
 module unload gcc
 module load r/gcc/4.3.1
 
-Rscript $path/helpers/fit.R \
+if [ "$isPanel" = "y" ]; then
+	suffix="panel_"
+else
+	suffix=""
+fi
+
+Rscript $path/helpers/"$suffix"fit.R \
     $SLURM_ARRAY_TASK_MAX \
     $SLURM_ARRAY_TASK_ID \
     $SLURM_NTASKS_PER_NODE \
