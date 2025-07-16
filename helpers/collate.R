@@ -4,7 +4,7 @@ options(warn = -1)
 suppressMessages(library(tidyverse))
 suppressMessages(library(ggdist))
 suppressMessages(library(ggnewscale))
-suppressMessages(library(pomp))
+suppressMessages(library(panelPomp))
 
 isPanel <- args[1]
 
