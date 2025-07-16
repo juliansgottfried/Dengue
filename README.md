@@ -25,7 +25,7 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_<month>_<day>_<x>`, where `<x>` is a lowercase letter identifying the run. Sequences of runs should have contiguous letters.
 
-2. Inside each folder place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files`.
+2. Inside each folder place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files` for specifications.
 
 3. Run `bash upload.sh`. Answer the prompts. You will need your HPC password.
 
@@ -37,7 +37,7 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 **On your computer:**
 
-6. Run `bash download.sh`. You will need your HPC password. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, and `plot.png`. Additionally, your main directory should now contain the updated file `summary.csv`.
+6. Run `bash download.sh`. You will need your HPC password. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, `plot.png`, and, if a panel fit was performed, `results_long.csv`. Additionally, your main directory should now contain the updated file `summary.csv`.
 
 7. Verify that these files are complete before proceeding with the final step.
 
