@@ -2,7 +2,7 @@ tmp <- read.csv("tmp_summary.csv")
 
 if (file.exists("summary.csv")) {
 	main <- read.csv("summary.csv")
-	main <- rbind(main,tmp)
+	main <- rbind(main[,2:ncol(main)],tmp)
 } else {
 	main <- tmp
 }
