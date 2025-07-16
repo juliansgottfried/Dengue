@@ -42,6 +42,9 @@ par_names <- c("delta","beta","gamma",
                "S_0","I_0","R_0",
                "sigma")
 
+specific_names <- c("rho",
+                    "S_0","I_0","R_0")
+
 state_names <- c("S","I","R")
 
 accum_names <- c("C")
@@ -57,9 +60,8 @@ barycentric_transf <- c()
 obs_vars <- "cases" 
 
 loc_key <- "loc"
+
 aggregate_key <- "aggregate"
-specific_names <- c("rho",
-                    "S_0","I_0","R_0")
 
 param_bounds <- list(
     delta=c(1/60,1/60),
