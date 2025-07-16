@@ -23,7 +23,7 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 **On your computer:**
 
-1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_<month>_<day>_<x>`, where `<x>` is a lowercase letter identifying the run. Sequences of runs should have contiguous letters.
+1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_[month]_[day]_[x]`, where `[x]` is a lowercase letter identifying the run. Sequences of runs should have contiguous letters.
 
 2. Inside each folder place a data file `dataset.csv` and an object file `object.R`. See the directory `example_files` for specifications.
 
