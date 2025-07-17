@@ -301,20 +301,19 @@ run_panel_fitting <- function(
     stopCluster(cl)
 }
 
-make_plot <- function(path,mle,enso) {
+make_plot <- function(path, mle, enso) {
 	po <- construct_pomp(path)
 	coef(po,names(mle)) <- mle
 
-	df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
-	
-	sims <- po %>% simulate(nsim=1000,
-				include.data=TRUE,
-				format="data.frame")
+	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	sims <- po %>% simulate(nsim = 1000,
+				    include.data = TRUE,
+				    format       = "data.frame")
 
 	set_0 <- function(x) (ifelse(is.na(x),0,x))
 	sims_cases <- sims %>% 
-		select(time,.id,all_of(obs_vars)) %>%
-		mutate(.id=ifelse(.id=="data","data","sim")) %>% 
+		select(time,.id, all_of(obs_vars)) %>%
+		mutate(.id=ifelse(.id=="data", "data", "sim")) %>% 
 		mutate_at(obs_vars,set_0)
 
 	if (enso) {
@@ -329,24 +328,24 @@ make_plot <- function(path,mle,enso) {
     				pull(upper))
 	}
 	
-	fill_colors <- c("black","#40d6ed")
+	fill_colors  <- c("black","#40d6ed")
 	color_colors <- c("black","#16a4ba")
-	labels <- c("Data","Simulation")
-	bg.color <- "#e6e6e6"
-	bg.color <- "white"
+	labels       <- c("Data","Simulation")
+	bg.color     <- "#e6e6e6"
+	bg.color     <- "white"
 
 	plotter <- ggplot() +
 		ggdist::stat_lineribbon(data=sims_cases,
-					mapping=aes(x=time,
-						y=cases,
-						color=.id,
-						fill=.id),
-					.width = c(0.1,0.9),
-					alpha=0.65,
-					linewidth=0.8)+
-		labs(x="Year",
-			y="Cases",
-			title="Dengue in Thailand")+
+					mapping   = aes(x=time,
+						y     = cases,
+						color = .id,
+						fill. = .id),
+					.width    = c(0.1,0.9),
+					alpha     = 0.65,
+					linewidth = 0.8)+
+		labs(x = "Year",
+			y  = "Cases",
+			title = "Dengue in Thailand")+
 		scale_fill_manual(values=fill_colors,
 				labels=labels)+
 		scale_color_manual(values=color_colors,
@@ -389,11 +388,12 @@ make_plot <- function(path,mle,enso) {
 		units = "in") %>% suppressWarnings()
 }
 
-make_panel_plot <- function(path,mle,enso) {
-    source(paste0(path,"object.R"))
+make_panel_plot <- function(path, mle, enso) {
 
-    df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
-    df[,loc_key] <- str_remove_all(unlist(df[,loc_key])," ")
+    source(paste0(path,"object.R"))
+    df <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
+
+    df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
     
     po <- construct_panel_pomp(path,df,NA)

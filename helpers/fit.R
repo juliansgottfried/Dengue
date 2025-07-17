@@ -8,16 +8,16 @@ set.seed(seed)
 
 args <- commandArgs(trailingOnly=TRUE)
 
-n_array <- as.numeric(args[1])
+n_array  <- as.numeric(args[1])
 array_id <- as.numeric(args[2])
-n_cores <- as.numeric(args[3])
+n_cores  <- as.numeric(args[3])
 fit_name <- args[4]
 n_refine <- as.numeric(args[5])
-nseq <- as.numeric(args[6])
+nseq     <- as.numeric(args[6])
 
-log_name <- Sys.getenv("LOGNAME")
-repo_path<-paste0("/scratch/",log_name,"/Dengue")
-path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+log_name  <- Sys.getenv("LOGNAME")
+repo_path <-paste0("/scratch/",log_name,"/Dengue")
+path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
 source(paste0(repo_path,"/helpers/helper_functions.R"))
 source(paste0(path,"object.R"))
