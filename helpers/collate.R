@@ -20,10 +20,6 @@ time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |>
     data.frame()
 colnames(time_df) = c("time","run")
 
-
-  #git config --global user.email "jc12343@nyu.edu"
-  #git config --global user.name "ChaosDonkey06"
-
 time_df=time_df |>
     mutate(time  = hms(time)) |>
     mutate(hours = hour(time),minutes=minute(time)) |>

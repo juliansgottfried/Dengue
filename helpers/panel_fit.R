@@ -15,9 +15,9 @@ fit_name <- args[4]
 n_refine <- as.numeric(args[5])
 nseq <- as.numeric(args[6])
 
-log_name <- Sys.getenv("LOGNAME")
-repo_path<-paste0("/scratch/",log_name,"/Dengue")
-path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+log_name  <- Sys.getenv("LOGNAME")
+repo_path <- paste0("/scratch/",log_name,"/Dengue")
+path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
 source(paste0(repo_path,"/helpers/helper_functions.R"))
 source(paste0(path,"object.R"))
@@ -29,7 +29,7 @@ len <- nseq/n_array
 init_vals <- init_vals[((array_id-1)*len+1):(array_id*len),]
 
 non_ivp <- c(0.02,0.01,0.001)
-ivp <- c(0.01,0.005,0.001)
+ivp     <- c(0.01,0.005,0.001)
 
 cut_names <- unlist(lapply(str_split(names(init_vals),"\\["),\(.).[1]))
 est_pars <- unique(cut_names[apply(init_vals,2,\(.)diff(range(.)))!=0])
