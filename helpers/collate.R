@@ -6,8 +6,7 @@ suppressMessages(library(ggdist))
 suppressMessages(library(ggnewscale))
 suppressMessages(library(panelPomp))
 
-args      <- commandArgs(trailingOnly=TRUE)
-isPanel   <- args[1] == "y"
+isPanel <- args[1]
 
 log_name  <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/",log_name,"/Dengue")
@@ -20,6 +19,10 @@ time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |>
     t() |> 
     data.frame()
 colnames(time_df) = c("time","run")
+
+
+  #git config --global user.email "jc12343@nyu.edu"
+  #git config --global user.name "ChaosDonkey06"
 
 time_df=time_df |>
     mutate(time  = hms(time)) |>
