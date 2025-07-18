@@ -23,7 +23,6 @@ source(paste0(repo_path,"/helpers/helper_functions.R"))
 source(paste0(path,"object.R"))
 
 df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
-
 po <- construct_pomp(path, df)
 
 pars_path <- paste0(path,"pars.csv")

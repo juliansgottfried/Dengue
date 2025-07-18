@@ -1,7 +1,5 @@
-construct_pomp <- function(path) {
+construct_pomp <- function(path, df) {
 	source(paste0(path,"object.R"))
-
-	df <- read_csv(paste0(path, "dataset.csv"),show_col_types=FALSE)
 
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
@@ -498,4 +496,157 @@ make_panel_plot <- function(path, mle, enso) {
            width = 12,
            height = 3+3*length(unique(region_matches)),
            units = "in") %>% suppressWarnings()
+}
+
+test_fitting <- function(
+        po, n_cores, parameters,
+        seed_num, rdd1, rdd2, rdd3,
+        n_refine,
+        Np1,Np2,Nmif,
+        resultw_path,
+        resultl_path,
+        log_path,
+        traces_path,
+        stats_path) {
+	print("ok")
+}
+
+run_panel_fitting_2 <- function(
+        po, n_cores, parameters,
+        seed_num, rdd1, rdd2, rdd3,
+        n_refine,
+        Np1,Np2,Nmif,
+        resultw_path,
+        resultl_path,
+        log_path,
+        traces_path,
+        stats_path) {
+ 
+    cl <- parallel::makeCluster(n_cores)
+    registerDoParallel(cl)
+    registerDoRNG(seed = as.integer(round(abs(seed_num))) + 1234)
+
+    ## for each parameter row, run mif
+    rs <- foreach::foreach(
+        i = seq_len(nrow(parameters)),
+        .packages = c("panelPomp","dplyr","readr")
+    ) %dopar% {
+        param <- as.numeric(parameters[i, ])
+        names(param) <- colnames(parameters)
+
+        cat(paste("Starting iteration", i, "\n"),
+            file = log_path,
+            append = TRUE)
+
+        rdds = list(rdd1,rdd2,rdd3)
+        keys <- names(po@unit_objects)
+
+        mifout <- tryCatch(po |>
+                               mif2(Np = Np1,
+                                    Nmif = Nmif,
+                                    cooling.type = "geometric",
+                                    cooling.fraction.50 = 0.5,
+                                    start = param,
+                                    rw.sd = rdds[[1]]),
+                           error = function(e) e)
+
+        get_trace <- function(i) {
+            lapply(keys,\(.) {
+                data.frame(mifout@unit_objects[[.]]@traces,iter=0:Nmif,run=i,unit=.)
+                }) |> bind_rows()
+        }
+
+	traces <- get_trace(1)
+        for (j in 1:n_refine) {
+            mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+            traces <- bind_rows(traces,get_trace(j+1))
+        }
+	if (file.exists(traces_path)) {
+            read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+        } else write_csv(traces,traces_path)
+
+        stats <- lapply(keys,\(.) {
+            data.frame(cond=mifout@unit_objects[[.]]@cond.logLik,
+                       eff=mifout@unit_objects[[.]]@eff.sample.size,
+                       time=mifout@unit_objects[[.]]@times,
+                       unit=.)
+            }) |> bind_rows()
+
+        if (file.exists(stats_path)) {
+            read_csv(stats_path) %>% bind_rows(stats) %>% write.csv(stats_path)
+        } else write_csv(stats,stats_path)
+
+        resultw <- c(rep(NA, length(param) + 4))
+        names(resultw) <- c("sample",colnames(parameters),
+                           "loglik","loglik.se","flag")
+
+        unique_pars <- c(names(shared(po)),rownames(specific(po)))
+        resultl <- matrix(rep(NA, length(keys)*(length(unique_pars) + 5)),nrow=length(keys))
+        colnames(resultl) <- c("sample","unit",unique_pars,
+                               "loglik","loglik.se","flag")
+        resultl <- data.frame(resultl)
+        resultl$unit <- keys
+
+        resultw["sample"] <- i
+        resultl$sample <- i
+
+        if (length(coef(mifout)) > 0) {
+            loglik_mif <- tryCatch(replicate(n = 10,
+                                             logLik(pfilter(po,
+                                                            params = coef(mifout),
+                                                            Np = Np2))),
+                                   error = function(e) e)
+
+            if (is.numeric(loglik_mif)) {
+                bl <- logmeanexp(loglik_mif, se = TRUE)
+                names(bl) <- c("loglik","loglik.se")
+                loglik_mif_est <- bl[1]
+                cat(paste(i, loglik_mif_est, "\n"), file = log_path, append = TRUE)
+
+                resultw["flag"] <- 2
+                resultl$flag <- 2
+            }
+            if (is.numeric(loglik_mif)) {
+                resultw[names(bl)] <- bl
+                resultl[,names(bl)] <- t(matrix(bl))[rep(1,length(keys)),]
+
+                resultw["flag"] <- 1
+                resultl$flag <- 1
+
+                par_out <- coef(mifout)
+                resultw[names(par_out)] <- par_out
+
+                par_out <- specific(mifout) |>
+                    t() |>
+                    data.frame() |>
+                    bind_cols(data.frame(t(shared(mifout))))
+
+                resultl[,colnames(par_out)] <- par_out
+            }
+        } else {
+            resultw["flag"] <- 3
+            resultl$flag <- 3
+            cat(paste(i, "failed", "\n"), file = log_path, append = TRUE)
+        }
+        list(resultw,resultl)
+    }
+    rw <- lapply(rs,\(. ).[[1]]) |>
+        bind_rows() |>
+        remove_missing()
+    rl <- lapply(rs,\(. ).[[2]]) |>
+        bind_rows() |>
+        remove_missing()
+
+    write.table(rw,
+                resultw_path,
+                append = TRUE,
+                col.names = !file.exists(result_path),
+                row.names = FALSE, sep = ",")
+    write.table(rl,
+                resultl_path,
+                append = TRUE,
+                col.names = !file.exists(result_path),
+                row.names = FALSE, sep = ",")
+
+    stopCluster(cl)
 }
