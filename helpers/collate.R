@@ -6,7 +6,8 @@ suppressMessages(library(ggdist))
 suppressMessages(library(ggnewscale))
 suppressMessages(library(panelPomp))
 
-isPanel <- args[1]
+args <- commandArgs(trailingOnly=TRUE)
+isPanel <- args[1]=="y"
 
 log_name  <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/",log_name,"/Dengue")

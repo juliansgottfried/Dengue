@@ -1,7 +1,7 @@
-construct_pomp <- function(path) {
+construct_pomp <- function(path, df) {
 	source(paste0(path,"object.R"))
 
-	df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	# df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
 
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
