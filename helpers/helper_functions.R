@@ -1,7 +1,7 @@
-construct_pomp <- function(path, df) {
+construct_pomp <- function(path) {
 	source(paste0(path,"object.R"))
 
-	# df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	df <- read_csv(paste0(path, "dataset.csv"),show_col_types=FALSE)
 
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
@@ -9,27 +9,27 @@ construct_pomp <- function(path, df) {
 	covariates <- repair_lookup_table(covariates, t_extrap)
 
 	po <- pomp(
-		data = df %>% select(time,all_of(obs_vars)) %>% na.omit,
-		times = "time",
-		t0 = with(df, 2*time[1]-time[2]),
-		covar = covariates,
-		rprocess = euler(step.fun = rproc, delta.t = 1/365),
-		rmeasure = rmeas,
-		dmeasure = dmeas,
-		rinit = rinit,
+		data       = df %>% select(time,all_of(obs_vars)) %>% na.omit,
+		times      = "time",
+		t0         = with(df, 2*time[1]-time[2]),
+		covar      = covariates,
+		rprocess   = euler(step.fun = rproc, delta.t = 1/365),
+		rmeasure   = rmeas,
+		dmeasure   = dmeas,
+		rinit      = rinit,
 		paramnames = par_names,
-		partrans = parameter_trans(
-			log = log_transf,
-			logit = logit_transf,
+		partrans   = parameter_trans(
+			log    = log_transf,
+			logit  = logit_transf,
 			barycentric = barycentric_transf),
-		accumvars = accum_names,
+		accumvars  = accum_names,
 		statenames = c(accum_names,state_names),
 		verbose = F)
 	
 	return(po)
 }
 
-construct_panel_pomp <- function(path,nseq) {
+construct_panel_pomp <- function(path, nseq) {
     source(paste0(path,"object.R"))
     
     df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
@@ -37,10 +37,12 @@ construct_panel_pomp <- function(path,nseq) {
 
     locs <- unname(unlist(df[,loc_key]))
     keys <- unique(locs)
-    tmp_ppo <- lapply(keys,function(x) {
+    tmp_ppo <- lapply(keys,function(x) 
+    {
         tmp_df = df[locs==x,] %>% select(-all_of(loc_key))
-        po <- construct_pomp(path,tmp_df)
+        po <- construct_pomp(path, tmp_df)
     })
+
     names(tmp_ppo) <- keys
 
     pars_path <- paste0(path,"pars.csv")
@@ -302,6 +304,7 @@ run_panel_fitting <- function(
 }
 
 make_plot <- function(path, mle, enso) {
+
 	po <- construct_pomp(path)
 	coef(po,names(mle)) <- mle
 
