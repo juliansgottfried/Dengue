@@ -98,10 +98,12 @@ run_fitting <- function(
 
 	traces <- data.frame(mifout@traces,iter=0:Nmif,run=1)
 
-	for (j in 1:n_refine) {
-		mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
-		traces_j <- data.frame(mifout@traces,iter=0:Nmif,run=j+1)
-		traces <- bind_rows(traces,traces_j)
+	if (n_refine > 0) {
+		for (j in 1:n_refine) {
+			mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+			traces_j <- data.frame(mifout@traces,iter=0:Nmif,run=j+1)
+			traces <- bind_rows(traces,traces_j)
+		}
 	}
 	if (file.exists(traces_path)) {
             read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
@@ -204,13 +206,17 @@ run_panel_fitting <- function(
                 data.frame(mifout@unit_objects[[.]]@traces,iter=0:Nmif,run=i,unit=.)
                 }) |> bind_rows()
         }
-        
+
         traces <- get_trace(1)
-        for (j in 1:n_refine) {
-            mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
-            traces <- bind_rows(traces,get_trace(j+1))
+
+	if (n_refine > 0) {
+                for (j in 1:n_refine) {
+                        mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+                        traces_j <- get_trace(j+1)
+                        traces <- bind_rows(traces,traces_j)
+                }
         }
-        
+
         if (file.exists(traces_path)) {
             read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
         } else write_csv(traces,traces_path)
@@ -302,11 +308,11 @@ run_panel_fitting <- function(
 }
 
 make_plot <- function(path, mle, enso) {
+	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	po <- construct_pomp(path, df)
 
-	po <- construct_pomp(path)
 	coef(po,names(mle)) <- mle
 
-	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
 	sims <- po %>% simulate(nsim = 1000,
 				    include.data = TRUE,
 				    format       = "data.frame")
@@ -397,7 +403,7 @@ make_panel_plot <- function(path, mle, enso) {
     df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
     
-    po <- construct_panel_pomp(path,df,NA)
+    po <- construct_panel_pomp(path,NA)
     
     coef(po,names(mle)) <- mle
     
@@ -508,7 +514,60 @@ test_fitting <- function(
         log_path,
         traces_path,
         stats_path) {
-	print("ok")
+	
+
+	param <- as.numeric(parameters[1, ])
+        names(param) <- colnames(parameters)
+
+        rdds = list(rdd1,rdd2,rdd3)
+        keys <- names(po@unit_objects)
+	
+	mifout <- tryCatch(po |>
+                               mif2(Np = 5,
+                                    Nmif = 1,
+                                    cooling.type = "geometric",
+                                    cooling.fraction.50 = 0.5,
+                                    start = param,
+                                    rw.sd = rdds[[1]]),
+                           error = function(e) e)
+
+	get_trace <- function(i) {
+            lapply(keys,\(.) {
+                data.frame(mifout@unit_objects[[.]]@traces,iter=0:Nmif,run=i,unit=.)
+                }) |> bind_rows()
+        }
+
+	traces <- get_trace(1)
+
+        if (n_refine > 0) {
+                for (j in 1:n_refine) {
+                        mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+                        traces_j <- get_trace(j+1)
+                        traces <- bind_rows(traces,traces_j)
+                }
+        }
+
+        stats <- lapply(keys,\(.) {
+            data.frame(cond=mifout@unit_objects[[.]]@cond.logLik,
+                       eff=mifout@unit_objects[[.]]@eff.sample.size,
+                       time=mifout@unit_objects[[.]]@times,
+                       unit=.)
+            }) |> bind_rows()
+
+        resultw <- c(rep(NA, length(param) + 4))
+        names(resultw) <- c("sample",colnames(parameters),
+                           "loglik","loglik.se","flag")
+
+        unique_pars <- c(names(shared(po)),rownames(specific(po)))
+        resultl <- matrix(rep(NA, length(keys)*(length(unique_pars) + 5)),nrow=length(keys))
+        colnames(resultl) <- c("sample","unit",unique_pars,
+                               "loglik","loglik.se","flag")
+        resultl <- data.frame(resultl)
+        resultl$unit <- keys
+
+        resultw["sample"] <- i
+        resultl$sample <- i
+
 }
 
 run_panel_fitting_2 <- function(
