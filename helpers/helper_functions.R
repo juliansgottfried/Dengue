@@ -1,4 +1,5 @@
 construct_pomp <- function(path) {
+
 	source(paste0(path,"object.R"))
 
 	df <- read_csv(paste0(path, "dataset.csv"),show_col_types=FALSE)
@@ -303,10 +304,28 @@ run_panel_fitting <- function(
     stopCluster(cl)
 }
 
+simulate_mle <- function(path, mle, save_filtered = TRUE) {
+
+    po <- construct_pomp(path)
+	coef(po,names(mle)) <- mle
+
+	df              <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
+	sim_states      <- po %>% simulate(nsim  = 1000,
+				                include.data = TRUE,
+				                format       = "data.frame")  %>% select(time, .id, all_of(state_names))
+    sim_states$type <- "sim_states"
+
+    sims_states           <- sims %>% select(time, .id, all_of(state_names))
+    filt_sims_states      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
+    filt_sims_states      <- filt_sims_states %>% pivot_wider(names_from="name")  
+    filt_sims_states$type <- "filter_states"
+    states_df <- rbind(sim_states, filt_sims_states)
+}
+
 make_plot <- function(path, mle, enso) {
 
 	po <- construct_pomp(path)
-	coef(po,names(mle)) <- mle
+	coef(po, names(mle)) <- mle
 
 	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
 	sims <- po %>% simulate(nsim = 1000,
@@ -317,7 +336,7 @@ make_plot <- function(path, mle, enso) {
 	sims_cases <- sims %>% 
 		select(time,.id, all_of(obs_vars)) %>%
 		mutate(.id=ifelse(.id=="data", "data", "sim")) %>% 
-		mutate_at(obs_vars,set_0)
+		mutate_at(obs_vars, set_0)
 
 	if (enso) {
 		enso_bounds <- df %>% 
@@ -391,6 +410,7 @@ make_plot <- function(path, mle, enso) {
 		units = "in") %>% suppressWarnings()
 }
 
+
 make_panel_plot <- function(path, mle, enso) {
 
     source(paste0(path,"object.R"))
@@ -398,14 +418,12 @@ make_panel_plot <- function(path, mle, enso) {
 
     df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
+    po                 <- construct_panel_pomp(path,df,NA)
     
-    po <- construct_panel_pomp(path,df,NA)
-    
-    coef(po,names(mle)) <- mle
+    coef(po, names(mle)) <- mle
     
     set_0 <- function(x) (ifelse(is.na(x),0,x))
-    
-    keys <- names(po@unit_objects)
+    keys  <- names(po@unit_objects)
     
     agg_matches <- df |>
         select(all_of(c(loc_key,aggregate_key))) |>
@@ -439,9 +457,10 @@ make_panel_plot <- function(path, mle, enso) {
                        pull(upper))
     }
     
-    fill_colors <- c("black","#40d6ed")
+    fill_colors  <- c("black","#40d6ed")
     color_colors <- c("black","#16a4ba")
-    labels <- c("Data","Simulation")
+
+    labels   <- c("Data","Simulation")
     bg.color <- "#e6e6e6"
     bg.color <- "white"
     
@@ -480,7 +499,7 @@ make_panel_plot <- function(path, mle, enso) {
                                  high="#f54997",
                                  name="ENSO")
     }
-    
+
     plotter <- plotter +
         theme_classic()+
         theme(legend.position="bottom",
