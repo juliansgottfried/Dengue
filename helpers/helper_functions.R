@@ -1,8 +1,5 @@
 construct_pomp <- function(path) {
-
 	source(paste0(path,"object.R"))
-
-	df <- read_csv(paste0(path, "dataset.csv"),show_col_types=FALSE)
 
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
@@ -101,20 +98,22 @@ run_fitting <- function(
 
 	traces <- data.frame(mifout@traces,iter=0:Nmif,run=1)
 
-	for (j in 1:n_refine) {
-		mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
-		traces_j <- data.frame(mifout@traces,iter=0:Nmif,run=j+1)
-		traces <- bind_rows(traces,traces_j)
+	if (n_refine > 0) {
+		for (j in 1:n_refine) {
+			mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+			traces_j <- data.frame(mifout@traces,iter=0:Nmif,run=j+1)
+			traces <- bind_rows(traces,traces_j)
+		}
 	}
 	if (file.exists(traces_path)) {
-            read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+            read_csv(traces_path) %>% bind_rows(traces) %>% write_csv(traces_path)
         } else write_csv(traces,traces_path)
 
         stats <- data.frame(cond=mifout@cond.logLik,
                             eff=mifout@eff.sample.size,
                             time=po@times)
         if (file.exists(stats_path)) {
-            read_csv(stats_path) %>% bind_rows(stats) %>% write.csv(stats_path)
+            read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
         } else write_csv(stats,stats_path)
             
         result <- c(rep(NA, length(param) + 4))
@@ -207,15 +206,19 @@ run_panel_fitting <- function(
                 data.frame(mifout@unit_objects[[.]]@traces,iter=0:Nmif,run=i,unit=.)
                 }) |> bind_rows()
         }
-        
+
         traces <- get_trace(1)
-        for (j in 1:n_refine) {
-            mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
-            traces <- bind_rows(traces,get_trace(j+1))
+
+	if (n_refine > 0) {
+                for (j in 1:n_refine) {
+                        mifout <- mifout |> mif2(rw.sd=rdds[[j+1]])
+                        traces_j <- get_trace(j+1)
+                        traces <- bind_rows(traces,traces_j)
+                }
         }
-        
+
         if (file.exists(traces_path)) {
-            read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+            read_csv(traces_path) %>% bind_rows(traces) %>% write_csv(traces_path)
         } else write_csv(traces,traces_path)
         
         stats <- lapply(keys,\(.) {
@@ -226,7 +229,7 @@ run_panel_fitting <- function(
             }) |> bind_rows()
 
         if (file.exists(stats_path)) {
-            read_csv(stats_path) %>% bind_rows(stats) %>% write.csv(stats_path)
+            read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
         } else write_csv(stats,stats_path)
         
         resultw <- c(rep(NA, length(param) + 4))
@@ -293,12 +296,12 @@ run_panel_fitting <- function(
     write.table(rw, 
                 resultw_path,
                 append = TRUE,
-                col.names = !file.exists(result_path),
+                col.names = !file.exists(resultw_path),
                 row.names = FALSE, sep = ",")
     write.table(rl, 
                 resultl_path,
                 append = TRUE,
-                col.names = !file.exists(result_path),
+                col.names = !file.exists(resultl_path),
                 row.names = FALSE, sep = ",")
     
     stopCluster(cl)
@@ -323,11 +326,12 @@ simulate_mle <- function(path, mle, save_filtered = TRUE) {
 }
 
 make_plot <- function(path, mle, enso) {
+	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+	po <- construct_pomp(path, df)
 
 	po <- construct_pomp(path)
-	coef(po, names(mle)) <- mle
+	coef(po,names(mle)) <- mle
 
-	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
 	sims <- po %>% simulate(nsim = 1000,
 				    include.data = TRUE,
 				    format       = "data.frame")
@@ -420,7 +424,9 @@ make_panel_plot <- function(path, mle, enso) {
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
     po                 <- construct_panel_pomp(path,df,NA)
     
-    coef(po, names(mle)) <- mle
+    po <- construct_panel_pomp(path,df,NA)
+    
+    coef(po,names(mle)) <- mle
     
     set_0 <- function(x) (ifelse(is.na(x),0,x))
     keys  <- names(po@unit_objects)
