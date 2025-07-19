@@ -106,14 +106,14 @@ run_fitting <- function(
 		}
 	}
 	if (file.exists(traces_path)) {
-            read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+            read_csv(traces_path) %>% bind_rows(traces) %>% write_csv(traces_path)
         } else write_csv(traces,traces_path)
 
         stats <- data.frame(cond=mifout@cond.logLik,
                             eff=mifout@eff.sample.size,
                             time=po@times)
         if (file.exists(stats_path)) {
-            read_csv(stats_path) %>% bind_rows(stats) %>% write.csv(stats_path)
+            read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
         } else write_csv(stats,stats_path)
             
         result <- c(rep(NA, length(param) + 4))
@@ -218,7 +218,7 @@ run_panel_fitting <- function(
         }
 
         if (file.exists(traces_path)) {
-            read_csv(traces_path) %>% bind_rows(traces) %>% write.csv(traces_path)
+            read_csv(traces_path) %>% bind_rows(traces) %>% write_csv(traces_path)
         } else write_csv(traces,traces_path)
         
         stats <- lapply(keys,\(.) {
@@ -229,7 +229,7 @@ run_panel_fitting <- function(
             }) |> bind_rows()
 
         if (file.exists(stats_path)) {
-            read_csv(stats_path) %>% bind_rows(stats) %>% write.csv(stats_path)
+            read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
         } else write_csv(stats,stats_path)
         
         resultw <- c(rep(NA, length(param) + 4))
@@ -296,12 +296,12 @@ run_panel_fitting <- function(
     write.table(rw, 
                 resultw_path,
                 append = TRUE,
-                col.names = !file.exists(result_path),
+                col.names = !file.exists(resultw_path),
                 row.names = FALSE, sep = ",")
     write.table(rl, 
                 resultl_path,
                 append = TRUE,
-                col.names = !file.exists(result_path),
+                col.names = !file.exists(resultl_path),
                 row.names = FALSE, sep = ",")
     
     stopCluster(cl)
