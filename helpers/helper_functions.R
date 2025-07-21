@@ -312,24 +312,28 @@ simulate_mle <- function(path, mle, save_filtered = TRUE) {
     po <- construct_pomp(path)
 	coef(po,names(mle)) <- mle
 
-	df              <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
-	sim_states      <- po %>% simulate(nsim  = 1000,
+	df                 <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
+	sims      <- po %>% simulate(nsim  = 1000,
 				                include.data = TRUE,
-				                format       = "data.frame")  %>% select(time, .id, all_of(state_names))
-    sim_states$type <- "sim_states"
-
-    sims_states           <- sims %>% select(time, .id, all_of(state_names))
+				                format       = "data.frame")
+    sim_states_df        <- sims %>% select(time, .id, all_of(c(state_names, accum_names)))                             
+    sim_states_df$type   <- "sim_states"
+	sims_cases_df        <- sims %>%  select(time,.id, all_of(obs_vars)) %>% mutate(.id=ifelse(.id=="data", "data", "sim")) #%>% mutate_at(obs_vars, set_0)
+                        
     filt_sims_states      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
     filt_sims_states      <- filt_sims_states %>% pivot_wider(names_from="name")  
     filt_sims_states$type <- "filter_states"
+
     states_df <- rbind(sim_states, filt_sims_states)
+
+    return(states_df)
 }
 
 make_plot <- function(path, mle, enso) {
 	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
-	po <- construct_pomp(path, df)
+	po   <- construct_pomp(path, df)
+	po   <- construct_pomp(path)
 
-	po <- construct_pomp(path)
 	coef(po,names(mle)) <- mle
 
 	sims <- po %>% simulate(nsim = 1000,

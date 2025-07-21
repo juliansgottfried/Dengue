@@ -100,7 +100,11 @@ summary <- lapply(result_type, function(type)
 
 			if (isPanel) {
 				make_panel_plot(fitting_folder_path, mle, T)
-			} else make_plot(fitting_folder_path, mle, F)
+			} else{
+				sims_df <- simulate_mle(path, mle)
+
+				make_plot(fitting_folder_path, mle, F)
+			}
 
 		}
 		
