@@ -24,7 +24,7 @@ construct_pomp <- function(path) {
 		accumvars  = accum_names,
 		statenames = c(accum_names,state_names),
 		verbose = F)
-	
+
 	return(po)
 }
 
@@ -304,72 +304,66 @@ run_panel_fitting <- function(
                 append = TRUE,
                 col.names = !file.exists(resultl_path),
                 row.names = FALSE, sep = ",")
-    
+
     stopCluster(cl)
 }
 
-simulate_mle <- function(path, mle, save_filtered = TRUE) {
-    path <- fitting_folder_path
+simulate_mle <- function(path, mle, save_sims=TRUE, save_filtered = TRUE) {
     po   <- construct_pomp(path)
 	coef(po, names(mle)) <- mle
-
 	sims      <- po %>% simulate(nsim  = 1000,
 				                include.data = TRUE,
 				                format       = "data.frame")
 
-    sim_states_df        <- sims %>% select(time, .id, all_of(c(state_names, accum_names)))                             
+    sim_states_df        <- sims %>% select(time, .id, all_of(c(state_names, accum_names)))
     sim_states_df$type   <- "sim_states"
 
-	set_0 <- function(x) (ifelse(is.na(x),0,x))
-	sim_cases_df <- sims %>% 
+	set_0        <- function(x) (ifelse(is.na(x),0,x))
+	sim_cases_df <- sims %>%
 		                select(time,.id, all_of(obs_vars)) %>%
-		                mutate(.id=ifelse(.id=="data", "data", "sim")) %>% 
 		                mutate_at(obs_vars, set_0)
-    write.csv(sim_cases_df,"./see.csv", row.names = FALSE)
 
+	sim_cases_df2 <- sims %>%
+		                select(time,.id, all_of(obs_vars)) %>%
+		                mutate_at(obs_vars, set_0)
 
     if (save_filtered==T){
+
         filt_sims_states_df      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
-        filt_sims_states_df      <- filt_sims_states_df %>% pivot_wider(names_from="name")  
+        filt_sims_states_df      <- filt_sims_states_df %>% pivot_wider(names_from="name")
         filt_sims_states_df$type <- "filter_states"
-        states_df <- rbind(sim_states_df, filt_sims_states_df)
+        states_df                <- rbind(sim_states_df, filt_sims_states_df)
 
     } else {
         states_df <- sim_states_df
     }
 
-    return(states_df, sim_cases_df)
+    if (save_sims==T) {
+        write_csv(sim_cases_df, paste0(path, "sim_cases.csv"))
+        write_csv(states_df, paste0(path, "sim_states.csv"))
+    }
+    return(list(states=states_df, sim_cases=sim_cases_df))
 }
 
-make_plot <- function(path, mle, enso) {
-	df   <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
-	po   <- construct_pomp(path, df)
-	po   <- construct_pomp(path)
+make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 
-	coef(po,names(mle)) <- mle
-
-	sims <- po %>% simulate(nsim = 1000,
-				    include.data = TRUE,
-				    format       = "data.frame")
-
-	set_0 <- function(x) (ifelse(is.na(x),0,x))
-	sims_cases <- sims %>% 
-		select(time,.id, all_of(obs_vars)) %>%
-		mutate(.id=ifelse(.id=="data", "data", "sim")) %>% 
-		mutate_at(obs_vars, set_0)
+    set_0      <- function(x) (ifelse(is.na(x),0,x))
+	sims_cases <- sim_cases_data.frame %>%
+                    mutate(.id=ifelse(.id=="data", "data", "sim")) %>%
+		            mutate_at(obs_vars, set_0)
 
 	if (enso) {
-		enso_bounds <- df %>% 
-    			filter(!is.na(cases)) %>% 
-    			mutate(enso=nino+nina) %>% 
-    			select(time,enso) %>% 
-    			mutate(upper=sims_cases %>% 
-    				filter(.id!="data") %>% 
-    				group_by(time) %>% 
-    				summarize(upper=quantile(cases, 0.95)) %>% 
+		enso_bounds <- df %>%
+    			filter(!is.na(cases)) %>%
+    			mutate(enso=nino+nina) %>%
+    			select(time,enso) %>%
+    			mutate(upper=sims_cases %>%
+    				filter(.id!="data") %>%
+    				group_by(time) %>%
+    				summarize(upper=quantile(cases, 0.95)) %>%
     				pull(upper))
 	}
-	
+
 	fill_colors  <- c("black","#40d6ed")
 	color_colors <- c("black","#16a4ba")
 	labels       <- c("Data","Simulation")
@@ -394,7 +388,7 @@ make_plot <- function(path, mle, enso) {
 				labels=labels)+
 		guides(color="none",
 			fill=guide_legend(title=""))
-	
+
 	if (enso) {
 		plotter <- plotter + 
 		    new_scale_fill()+
@@ -411,7 +405,7 @@ make_plot <- function(path, mle, enso) {
                            	 	high="#f54997",
                             		name="ENSO")
 	}
-	
+
 	plotter <- plotter +
 	    theme_classic()+
 		theme(legend.position="bottom",
@@ -424,7 +418,7 @@ make_plot <- function(path, mle, enso) {
 
 	ggsave(filename="plot.png",
 		plot = plotter,
-		path = path,
+		path = path_to_save_fig,
 		width = 12,
 		height = 6,
 		units = "in") %>% suppressWarnings()

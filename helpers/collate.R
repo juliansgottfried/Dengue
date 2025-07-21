@@ -15,9 +15,9 @@ path_name <- paste0("/scratch/", log_name,"/Dengue")
 source(paste0(path_name, "/helpers/helper_functions.R"))
 
 time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |> 
-    t() |> 
-    na.omit() |> 
-    t() |> 
+    t() |>
+    na.omit() |>
+    t() |>
     data.frame()
 colnames(time_df) = c("time", "run")
 
@@ -41,7 +41,7 @@ process <- function(path, par_names) {
 result_type <- c("results", "traces", "stats")
 if (isPanel) result_type <- c("results_long", result_type)
 
-summary <- lapply(result_type, function(type) 
+summary <- lapply(result_type, function(type)
 {
     print(paste0(toupper(type)))
 
@@ -51,7 +51,11 @@ summary <- lapply(result_type, function(type)
     summary <- map2(paths, names,function(path, name) {
         print(paste0(name))
 
-		fitting_folder_path <- paste0(path_name,"/folders_for_fit/", name,"/")
+		fitting_folder_path <- paste0(path_name, "/folders_for_fit/", name, "/")
+
+		setwd("./Dengue")
+		path_name 			<- "/Users/chaosdonkey06/Dropbox/My Mac (Jaimes-MacBook-Pro.local)/Desktop/Pascual-lab/Dengue"
+		fitting_folder_path <- "./fitting_folders2/run_07_16_a/"#paste0(path_name, "/folders_for_fit2/", "run_07_16_a","/")
 
 		source(paste0(fitting_folder_path, "object.R"))
 
@@ -65,7 +69,7 @@ summary <- lapply(result_type, function(type)
 		accum <- process(files[1], par_names)
 
 		if (length(files)>1) {
-			for (i in 2:length(files)) 
+			for (i in 2:length(files))
 			{
 				add   <- process(files[i], par_names)
 				accum <- bind_rows(accum, add)
@@ -74,13 +78,13 @@ summary <- lapply(result_type, function(type)
 
 		summary = NULL
 
-		if (type=="results") 
+		if (type=="results")
 		{
 			accum['ll_lowIQ'] <- accum$loglik - 0.6745 * accum$loglik.se
 			accum    		  <- accum %>% arrange(-ll_lowIQ)
 			init_vals 		  <- read_csv(paste0(fitting_folder_path, "pars.csv"), show_col_types=F)
 			k      	  		  <- sum(apply(init_vals, 2, \(.) diff(range(.)))!=0)
-			
+
 			maxlik       <- accum %>% pull(loglik)   %>% head(1)
 			maxlik_lowIQ <- accum %>% pull(ll_lowIQ) %>% head(1)
 
@@ -88,12 +92,12 @@ summary <- lapply(result_type, function(type)
 			aic_lowIQ <- 2*(k-maxlik_lowIQ)
 
 			time    <- time_df %>% filter(run==name) %>% pull(time)
-			summary <- c(run		 = name, 
-						time		 = time, 
-						loglik       = maxlik, 
-						loglik_lowIQ = maxlik_lowIQ, 
-						k			 = k, 
-						aic			 = aic, 
+			summary <- c(run		 = name,
+						time		 = time,
+						loglik       = maxlik,
+						loglik_lowIQ = maxlik_lowIQ,
+						k			 = k,
+						aic			 = aic,
 						aic_lowIQ	 = aic_lowIQ)
 			mle     <- accum %>% slice(1)
 			print("(saving simulation plot)")
@@ -101,14 +105,15 @@ summary <- lapply(result_type, function(type)
 			if (isPanel) {
 				make_panel_plot(fitting_folder_path, mle, T)
 			} else{
-	
-				sims_df <- simulate_mle(fitting_folder_path, mle)
+				sim_df_list   <- simulate_mle(fitting_folder_path, mle, save_sims=T)
+				sim_states_df <- sim_df_list$states
+				sim_cases_df  <- sim_df_list$sim_cases
 
-				make_plot(fitting_folder_path, mle, F)
+				make_plot(sim_cases_df, fitting_folder_path, F)
 			}
 
 		}
-		
+
 		write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
 		return(summary)
     }
