@@ -48,14 +48,14 @@ summary <- lapply(result_type, function(type)
     paths <- list.files(paste0(path_name,"/out/",type),full.names=T)
     names <- list.files(paste0(path_name,"/out/",type),full.names=F)
 
-    summary <- map2(paths, names,function(path,name) {
+    summary <- map2(paths, names,function(path, name) {
         print(paste0(name))
 
 		fitting_folder_path <- paste0(path_name,"/folders_for_fit/", name,"/")
 
 		source(paste0(fitting_folder_path, "object.R"))
 
-		files <- list.files(path,full.names=T)
+		files <- list.files(path, full.names=T)
 
 		if (length(files)==0) {
 			print(paste0("No files in ",type,"/",name))
@@ -101,7 +101,8 @@ summary <- lapply(result_type, function(type)
 			if (isPanel) {
 				make_panel_plot(fitting_folder_path, mle, T)
 			} else{
-				sims_df <- simulate_mle(path, mle)
+	
+				sims_df <- simulate_mle(fitting_folder_path, mle)
 
 				make_plot(fitting_folder_path, mle, F)
 			}

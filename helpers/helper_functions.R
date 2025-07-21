@@ -1,13 +1,14 @@
 construct_pomp <- function(path) {
 	source(paste0(path,"object.R"))
+    df         <- read_csv(paste0(path,"dataset.csv"), show_col_types=FALSE)
 
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
-	t_extrap <- with(df, c(2 * time[1] - time[2], time))
+	t_extrap   <- with(df, c(2 * time[1] - time[2], time))
 	covariates <- repair_lookup_table(covariates, t_extrap)
 
 	po <- pomp(
-		data       = df %>% select(time,all_of(obs_vars)) %>% na.omit,
+		data       = df %>% select(time, all_of(obs_vars)) %>% na.omit,
 		times      = "time",
 		t0         = with(df, 2*time[1]-time[2]),
 		covar      = covariates,
@@ -308,25 +309,36 @@ run_panel_fitting <- function(
 }
 
 simulate_mle <- function(path, mle, save_filtered = TRUE) {
+    path <- fitting_folder_path
+    po   <- construct_pomp(path)
+	coef(po, names(mle)) <- mle
 
-    po <- construct_pomp(path)
-	coef(po,names(mle)) <- mle
-
-	df                 <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
 	sims      <- po %>% simulate(nsim  = 1000,
 				                include.data = TRUE,
 				                format       = "data.frame")
+
     sim_states_df        <- sims %>% select(time, .id, all_of(c(state_names, accum_names)))                             
     sim_states_df$type   <- "sim_states"
-	sims_cases_df        <- sims %>%  select(time,.id, all_of(obs_vars)) %>% mutate(.id=ifelse(.id=="data", "data", "sim")) #%>% mutate_at(obs_vars, set_0)
-                        
-    filt_sims_states      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
-    filt_sims_states      <- filt_sims_states %>% pivot_wider(names_from="name")  
-    filt_sims_states$type <- "filter_states"
 
-    states_df <- rbind(sim_states, filt_sims_states)
+	set_0 <- function(x) (ifelse(is.na(x),0,x))
+	sim_cases_df <- sims %>% 
+		                select(time,.id, all_of(obs_vars)) %>%
+		                mutate(.id=ifelse(.id=="data", "data", "sim")) %>% 
+		                mutate_at(obs_vars, set_0)
+    write.csv(sim_cases_df,"./see.csv", row.names = FALSE)
 
-    return(states_df)
+
+    if (save_filtered==T){
+        filt_sims_states_df      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
+        filt_sims_states_df      <- filt_sims_states_df %>% pivot_wider(names_from="name")  
+        filt_sims_states_df$type <- "filter_states"
+        states_df <- rbind(sim_states_df, filt_sims_states_df)
+
+    } else {
+        states_df <- sim_states_df
+    }
+
+    return(states_df, sim_cases_df)
 }
 
 make_plot <- function(path, mle, enso) {
@@ -354,7 +366,7 @@ make_plot <- function(path, mle, enso) {
     			mutate(upper=sims_cases %>% 
     				filter(.id!="data") %>% 
     				group_by(time) %>% 
-    				summarize(upper=quantile(cases,0.95)) %>% 
+    				summarize(upper=quantile(cases, 0.95)) %>% 
     				pull(upper))
 	}
 	
