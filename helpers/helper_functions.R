@@ -81,7 +81,7 @@ run_fitting <- function(
     ) %dopar% {
         param <- as.numeric(parameters[i, ])
         names(param) <- colnames(parameters)
-        
+
         cat(paste("Starting iteration", i, "\n"),
 		file = log_path,
                 append = TRUE)
@@ -116,7 +116,7 @@ run_fitting <- function(
         if (file.exists(stats_path)) {
             read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
         } else write_csv(stats,stats_path)
-            
+
         result <- c(rep(NA, length(param) + 4))
         names(result) <- c("sample",
                            colnames(parameters),
@@ -130,7 +130,7 @@ run_fitting <- function(
                                                             params = coef(mifout),
                                                             Np = Np2))),
                                    error = function(e) e)
-                
+
             if (is.numeric(loglik_mif)) {
                 bl <- logmeanexp(loglik_mif, se = TRUE)
                 loglik_mif_est <- bl[1]
@@ -153,7 +153,7 @@ run_fitting <- function(
     r1 <- r1 |>
         bind_rows() |>
         remove_missing()
-    write.table(r1, 
+    write.table(r1,
                 result_path,
                 append = TRUE,
                 col.names = !file.exists(result_path),
@@ -181,7 +181,7 @@ run_panel_fitting <- function(
     ## for each parameter row, run mif
     rs <- foreach::foreach(
         i = seq_len(nrow(parameters)),
-        .packages = c("panelPomp","dplyr","readr")
+        .packages = c("panelPomp", "dplyr", "readr")
     ) %dopar% {
         param <- as.numeric(parameters[i, ])
         names(param) <- colnames(parameters)
@@ -320,16 +320,11 @@ simulate_mle <- function(path, mle, save_sims=TRUE, save_filtered = TRUE) {
 
 	set_0        <- function(x) (ifelse(is.na(x),0,x))
 	sim_cases_df <- sims %>%
-		                select(time,.id, all_of(obs_vars)) %>%
-		                mutate_at(obs_vars, set_0)
-
-	sim_cases_df2 <- sims %>%
-		                select(time,.id, all_of(obs_vars)) %>%
-		                mutate_at(obs_vars, set_0)
+		                select(time,.id, all_of(obs_vars)) %>% mutate_at(obs_vars, set_0)
 
     if (save_filtered==T){
 
-        filt_sims_states_df      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format= "data.frame") 
+        filt_sims_states_df      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format="data.frame")
         filt_sims_states_df      <- filt_sims_states_df %>% pivot_wider(names_from="name")
         filt_sims_states_df$type <- "filter_states"
         states_df                <- rbind(sim_states_df, filt_sims_states_df)
@@ -364,8 +359,8 @@ make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
     				pull(upper))
 	}
 
-	fill_colors  <- c("black","#40d6ed")
-	color_colors <- c("black","#16a4ba")
+	fill_colors  <- c("black", "#40d6ed")
+	color_colors <- c("black", "#16a4ba")
 	labels       <- c("Data","Simulation")
 	bg.color     <- "#e6e6e6"
 	bg.color     <- "white"
@@ -378,32 +373,33 @@ make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 						fill. = .id),
 					.width    = c(0.1,0.9),
 					alpha     = 0.65,
-					linewidth = 0.8)+
+					linewidth = 0.8) +
 		labs(x = "Year",
 			y  = "Cases",
-			title = "Dengue in Thailand")+
+			title = "Dengue in Thailand") +
 		scale_fill_manual(values=fill_colors,
-				labels=labels)+
+				labels=labels) +
 		scale_color_manual(values=color_colors,
-				labels=labels)+
+				labels=labels) +
 		guides(color="none",
 			fill=guide_legend(title=""))
 
 	if (enso) {
-		plotter <- plotter + 
-		    new_scale_fill()+
+		plotter <- plotter   +
+		    new_scale_fill() +
     			geom_rect(data=enso_bounds,
     				mapping=aes(xmin=time,
-    					xmax=time+1/12,
-    					ymin=upper,
-    					ymax=Inf,
-    					fill=enso),
-    				alpha=0.45,
-    				inherit.aes=F)+
-    			scale_fill_gradient2(low="#f2c51f",
-					mid=bg.color,
-                           	 	high="#f54997",
-                            		name="ENSO")
+    					xmax = time+1/12,
+    					ymin = upper,
+    					ymax = Inf,
+    					fill = enso),
+    				alpha    = 0.45,
+    				inherit.aes = F)+
+    			scale_fill_gradient2(
+                    low  = "#f2c51f",
+					mid  = bg.color,
+                    high = "#f54997",
+                    name = "ENSO")
 	}
 
 	plotter <- plotter +
@@ -411,10 +407,10 @@ make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 		theme(legend.position="bottom",
 			legend.title=element_text(size=10,vjust=0.8),
 			text=element_text(size = 14),
-			legend.background=element_rect(fill=bg.color,color=bg.color),
-			panel.background=element_rect(fill=bg.color,color=bg.color),
-			plot.background=element_rect(fill=bg.color,color=bg.color))+
-		ylim(0,5000)
+			legend.background = element_rect(fill=bg.color,color=bg.color),
+			panel.background  = element_rect(fill=bg.color,color=bg.color),
+			plot.background   = element_rect(fill=bg.color,color=bg.color))+
+		ylim(0, 5000)
 
 	ggsave(filename="plot.png",
 		plot = plotter,
@@ -427,15 +423,15 @@ make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 
 make_panel_plot <- function(path, mle, enso) {
 
-    source(paste0(path,"object.R"))
+    source(paste0(path, "object.R"))
     df <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
 
     df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
+
     po                 <- construct_panel_pomp(path,df,NA)
-    
-    po <- construct_panel_pomp(path,df,NA)
-    
+    po                 <- construct_panel_pomp(path,df,NA)
+
     coef(po,names(mle)) <- mle
     
     set_0 <- function(x) (ifelse(is.na(x),0,x))
@@ -459,27 +455,27 @@ make_panel_plot <- function(path, mle, enso) {
                    agg=agg_matches[.]) |>
             mutate_at(obs_vars,set_0)
         }) |> bind_rows()
-    
+
     if (enso) {
         enso_bounds <- df |>
             filter(!is.na(cases)) |>
             mutate(enso=nino+nina) |>
             select(time,enso) |>
-            distinct() |> 
+            distinct() |>
             mutate(upper=sims |>
                        filter(.id!="data") |>
                        group_by(time)|>
                        summarize(upper=quantile(cases,0.95))|>
                        pull(upper))
     }
-    
+
     fill_colors  <- c("black","#40d6ed")
     color_colors <- c("black","#16a4ba")
 
     labels   <- c("Data","Simulation")
     bg.color <- "#e6e6e6"
     bg.color <- "white"
-    
+
     plotter <- ggplot() +
         ggdist::stat_lineribbon(data=sims,
                                 mapping=aes(x=time,

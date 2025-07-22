@@ -53,10 +53,6 @@ summary <- lapply(result_type, function(type)
 
 		fitting_folder_path <- paste0(path_name, "/folders_for_fit/", name, "/")
 
-		setwd("./Dengue")
-		path_name 			<- "/Users/chaosdonkey06/Dropbox/My Mac (Jaimes-MacBook-Pro.local)/Desktop/Pascual-lab/Dengue"
-		fitting_folder_path <- "./fitting_folders2/run_07_16_a/"#paste0(path_name, "/folders_for_fit2/", "run_07_16_a","/")
-
 		source(paste0(fitting_folder_path, "object.R"))
 
 		files <- list.files(path, full.names=T)
@@ -114,7 +110,7 @@ summary <- lapply(result_type, function(type)
 
 		}
 
-		write_csv(accum,paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
+		write_csv(accum, paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
 		return(summary)
     }
 	)
@@ -122,6 +118,6 @@ summary <- lapply(result_type, function(type)
 })
 
 summary_data <- bind_rows(summary[[1]])
-write_csv(summary_data,paste0(path_name,"/folders_for_fit/summary.csv"))
+write_csv(summary_data,paste0(path_name, "/folders_for_fit/summary.csv"))
 
 options(warn = oldw)
