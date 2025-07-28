@@ -22,9 +22,9 @@ path      <- paste0(repo_path, "/folders_for_fit/", fit_name, "/")
 source(paste0(repo_path, "/helpers/helper_functions.R"))
 source(paste0(path, "object.R"))
 
-po <- construct_pomp(path)
-
+po        <- construct_pomp(path)
 pars_path <- paste0(path, "pars.csv")
+
 if (!file.exists(pars_path)) {
 	param_bounds <- param_bounds %>% as.data.frame
 	init_vals <- sobol_design(
@@ -35,12 +35,11 @@ if (!file.exists(pars_path)) {
 } else init_vals <- read_csv(pars_path)
 
 est_pars  <- par_names[apply(init_vals,2,\(.) diff(range(.)))!=0]
-
 len       <- nseq/n_array
 init_vals <- init_vals[((array_id-1)*len+1):(array_id*len),]
 
-non_ivp <- c(0.02, 0.01, 0.001)
-ivp     <- c(0.01, 0.005, 0.001)
+non_ivp   <- c(0.02, 0.01,  0.001)
+ivp       <- c(0.01, 0.005, 0.001)
 
 lapply(1:3,function(order) {
     paste0(paste0("rdd",order),
@@ -50,8 +49,7 @@ lapply(1:3,function(order) {
                                   paste0("=ivp(",ivp[order],")")),
                   collapse=","),")") %>%
         str2expression %>%
-        eval.parent
-})
+        eval.parent })
 
 run_fitting(po         = po,
             n_cores    = n_cores,

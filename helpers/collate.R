@@ -13,6 +13,7 @@ log_name  <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/", log_name,"/Dengue")
 
 source(paste0(path_name, "/helpers/helper_functions.R"))
+source(paste0(path_name, "/helpers/plot_functions.R"))
 
 time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |> 
     t() |>
@@ -102,8 +103,15 @@ summary <- lapply(result_type, function(type)
 			if (isPanel) {
 				make_panel_plot(fitting_folder_path, mle, T)
 			} else{
-				sim_df_list  <- simulate_mle(fitting_folder_path, save_sims=T, save_filtered=T)
-				if (file.exists(paste0(path, "dataset_test.csv"))){
+				if (file.exists(paste0(fitting_folder_path, "sim_cases.csv"))){
+					sim_df_list  <- simulate_mle(fitting_folder_path, save_sims=T, save_filtered=T)
+					sim_cases_df <- sim_df_list$sim_cases
+
+				}else{
+					sim_cases_df <- read_csv(paste0(fitting_folder_path, "sim_cases.csv"), show_col_types=F)
+				}
+
+				if (file.exists(paste0(fitting_folder_path, "dataset_test.csv")) & !file.exists(paste0(fitting_folder_path, "forecast.csv"))){
 					fcast_df <- forecast_mle(fitting_folder_path)
 				}
 
