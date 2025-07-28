@@ -96,14 +96,16 @@ summary <- lapply(result_type, function(type)
 						aic			 = aic,
 						aic_lowIQ	 = aic_lowIQ)
 			mle     <- accum %>% slice(1)
+
 			print("(saving simulation plot)")
 
 			if (isPanel) {
 				make_panel_plot(fitting_folder_path, mle, T)
 			} else{
-				sim_df_list   <- simulate_mle(fitting_folder_path, mle, save_sims=T)
-				sim_states_df <- sim_df_list$states
-				sim_cases_df  <- sim_df_list$sim_cases
+				sim_df_list  <- simulate_mle(fitting_folder_path, save_sims=T, save_filtered=T)
+				if (file.exists(paste0(path, "dataset_test.csv"))){
+					fcast_df <- forecast_mle(fitting_folder_path)
+				}
 
 				make_plot(sim_cases_df, fitting_folder_path, F)
 			}
