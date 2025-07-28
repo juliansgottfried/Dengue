@@ -1,4 +1,4 @@
 out
 folders_for_fit
 helpers/email.sh
-
+local_analysis/*
