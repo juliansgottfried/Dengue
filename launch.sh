@@ -7,6 +7,7 @@ read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess) ' ru
 read -p $'Number of mif2 refinement runs:\n(0, 1, or 2) ' n_refine
 read -p "Panel fit? (y or n) " isPanel
 read -p "Specific fit name (e.g., run_07_17_bb or n) " fit_name
+read -p "Simulate MLE (e.g., y or n) " sim_mle
 
 head -n 1 $path/helpers/email.sh > $path/helpers/line1.sh
 echo "n_refine=$n_refine" > $path/helpers/line2.sh
@@ -49,7 +50,8 @@ else
             --output=$path/out/output/$name/slurm-%A_%a.out \
             --job-name=$name \
             --time=$run_time \
-        --mail-user=$email \
+            --mail-user=$email \
             $path/helpers/run.slurm
+            
     done
 fi
