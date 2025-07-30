@@ -12,7 +12,6 @@ path=/scratch/$LOGNAME/Dengue
 source $path/helpers/email.sh
 #source ./helpers/email.sh
 
-
 module unload r
 module unload gcc
 module load r/gcc/4.3.1

@@ -10,7 +10,7 @@ args      <- commandArgs(trailingOnly=TRUE)
 isPanel   <- args[1]=="y"
 
 log_name  <- Sys.getenv("LOGNAME")
-path_name <- paste0("/scratch/", log_name,"/Dengue")
+path_name <- paste0("/scratch/", log_name, "/Dengue")
 
 source(paste0(path_name, "/helpers/helper_functions.R"))
 source(paste0(path_name, "/helpers/plot_functions.R"))
@@ -33,23 +33,21 @@ time_df=time_df |>
 
 process <- function(path, par_names) {
 	read_csv(path) %>%
-		select(contains(c("sample", "unit", par_names,"loglik","loglik.se","flag",
-			"time","cond","eff",
-			"iter","run"))) %>%
-		mutate_all(as.numeric) %>% suppressMessages()
+		select(contains(c("sample", "unit", par_names, "loglik","loglik.se","flag",
+					"time","cond","eff", "iter","run"))) %>% mutate_all(as.numeric) %>% suppressMessages()
 	}
 
-result_type <- c("results", "traces", "stats")
+result_type 			 <- c("results", "traces", "stats")
 if (isPanel) result_type <- c("results_long", result_type)
 
 summary <- lapply(result_type, function(type)
 {
     print(paste0(toupper(type)))
 
-    paths <- list.files(paste0(path_name,"/out/",type),full.names=T)
-    names <- list.files(paste0(path_name,"/out/",type),full.names=F)
+    paths  <- list.files(paste0(path_name,"/out/",type),full.names=T)
+    names  <- list.files(paste0(path_name,"/out/",type),full.names=F)
 
-    summary <- map2(paths, names,function(path, name) {
+    summary <- map2(paths, names, function(path, name) {
         print(paste0(name))
 
 		fitting_folder_path <- paste0(path_name, "/folders_for_fit/", name, "/")
@@ -96,31 +94,10 @@ summary <- lapply(result_type, function(type)
 						k			 = k,
 						aic			 = aic,
 						aic_lowIQ	 = aic_lowIQ)
-			mle     <- accum %>% slice(1)
-
-			print("(saving simulation plot)")
-
-			if (isPanel) {
-				make_panel_plot(fitting_folder_path, mle, T)
-			} else{
-				if (file.exists(paste0(fitting_folder_path, "sim_cases.csv"))){
-					sim_df_list  <- simulate_mle(fitting_folder_path, save_sims=T, save_filtered=T)
-					sim_cases_df <- sim_df_list$sim_cases
-
-				}else{
-					sim_cases_df <- read_csv(paste0(fitting_folder_path, "sim_cases.csv"), show_col_types=F)
-				}
-
-				if (file.exists(paste0(fitting_folder_path, "dataset_test.csv")) & !file.exists(paste0(fitting_folder_path, "forecast.csv"))){
-					fcast_df <- forecast_mle(fitting_folder_path)
-				}
-
-				make_plot(sim_cases_df, fitting_folder_path, F)
-			}
+			mle     <- accum %>% slice(1)	
 
 		}
-
-		write_csv(accum, paste0(path_name,"/folders_for_fit/",name,"/",type,".csv"))
+		write_csv(accum, paste0(path_name, "/folders_for_fit/",name,"/",type,".csv"))
 		return(summary)
     }
 	)

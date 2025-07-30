@@ -88,14 +88,13 @@ run_fitting <- function(
 	rdds = list(rdd1,rdd2,rdd3)
 
         mifout <- tryCatch(po |>
-                               mif2(Np = Np1,
-                                    Nmif = Nmif,
-                                    cooling.type = "geometric",
+                               mif2(Np                  = Np1,
+                                    Nmif                = Nmif,
+                                    cooling.type        = "geometric",
                                     cooling.fraction.50 = 0.5,
-                                    params = param,
-                                    rw.sd = rdds[[1]]),
+                                    params              = param,
+                                    rw.sd               = rdds[[1]]),
                            error = function(e) e)
-
 	traces <- data.frame(mifout@traces,iter=0:Nmif,run=1)
 
 	if (n_refine > 0) {
@@ -166,7 +165,7 @@ run_panel_fitting <- function(
         po, n_cores, parameters,
         seed_num, rdd1, rdd2, rdd3,
         n_refine,
-	Np1,Np2,Nmif,
+	    Np1, Np2, Nmif,
         resultw_path,
         resultl_path,
         log_path,
@@ -308,6 +307,7 @@ run_panel_fitting <- function(
 }
 
 simulate_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
+
     df   <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
     po   <- construct_pomp(path, df)
     mle  <- read_csv(paste0(path, "results.csv"), show_col_types=FALSE) %>% head(1)%>% select(all_of(par_names))
