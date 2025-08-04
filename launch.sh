@@ -3,23 +3,27 @@ path=/scratch/$LOGNAME/Dengue
 runs=($(ls $path/folders_for_fit))
 
 read -p $'Number of initial parameter combinations:\n(MUST be a multiple of 50, SHOULD be a multiple of 500) ' nseq
-read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess) ' run_time
+read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess, or 360 for panel fits) ' run_time
 read -p $'Number of mif2 refinement runs:\n(0, 1, or 2) ' n_refine
-read -p "Panel fit? (y or n) " isPanel
-read -p "Specific fit name (e.g., run_07_17_bb or n) " fit_name
-read -p "Simulate MLE (e.g., y or n) " sim_mle
+read -p $'Panel fit?\n(y or n) ' isPanel
+read -p $'Launch only one fit from folders_for_fit, or all?\n(one or all) ' which_fit
+fit_name=""
+if [ $which_fit == "one" ]; then
+	read -p $'fit_name:\n(e.g. run_01_01_a) ' fit_name
+fi
 
-head -n 1 $path/helpers/email.sh > $path/helpers/line1.sh
-echo "n_refine=$n_refine" > $path/helpers/line2.sh
-echo "nseq=$nseq" > $path/helpers/line3.sh
-echo "isPanel=$isPanel" > $path/helpers/line4.sh
-cat $path/helpers/line*.sh > $path/helpers/email.sh
-rm $path/helpers/line*.sh
+echo "n_refine=$n_refine" > $path/tmp_line1.sh
+echo "nseq=$nseq" > $path/tmp_line2.sh
+echo "isPanel=$isPanel" > $path/tmp_line3.sh
+cat $path/tmp_line*.sh > $path/hyperparams.sh
+rm $path/tmp_line*.sh
 
 source $path/helpers/email.sh
 
-if [ $fit_name != "n" ]; then
-    echo "running $fit_name"
+if [ $which_fit == "one" ]; then
+    echo "Running $fit_name"
+
+    mv $path/hyperparams.sh $path/folders_for_fit/$name
     name=$fit_name
     mkdir $path/out/output/$name
     mkdir $path/out/results/$name
@@ -32,12 +36,13 @@ if [ $fit_name != "n" ]; then
         --output=$path/out/output/$name/slurm-%A_%a.out \
         --job-name=$name \
         --time=$run_time \
-    --mail-user=$email \
+    	--mail-user=$email \
         $path/helpers/run.slurm
 else
-   echo "running all fits in folders_for_fit"
+   echo "Running all fits"
 
-    for i in "${!runs[@]}"; do
+   cp $path/hyperparams.sh $path/folders_for_fit/$name
+   for i in "${!runs[@]}"; do
         name=${runs[i]}
         mkdir $path/out/output/$name
         mkdir $path/out/results/$name
@@ -52,6 +57,6 @@ else
             --time=$run_time \
             --mail-user=$email \
             $path/helpers/run.slurm
-            
+    rm $path/hyperparams.sh
     done
 fi
