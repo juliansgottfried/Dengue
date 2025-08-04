@@ -199,14 +199,14 @@ run_panel_fitting <- function(
                                     start = param,
                                     rw.sd = rdds[[1]]),
                            error = function(e) e)
-        
-        get_trace <- function(i) {
-            lapply(keys,\(.) {
-                data.frame(mifout@unit_objects[[.]]@traces,iter=0:Nmif,run=i,unit=.)
-                }) |> bind_rows()
-        }
 
-        traces <- get_trace(1)
+	get_trace <- function(i) {
+            cbind(as.data.frame(traces(mifout)),
+                  data.frame(iter=0:Nmif,
+                             run=i))
+        }
+ 
+	traces <- get_trace(1)
 
 	if (n_refine > 0) {
                 for (j in 1:n_refine) {
@@ -285,23 +285,36 @@ run_panel_fitting <- function(
         }
         list(resultw,resultl)
     }
+	
+    cat(paste("Success 1","\n"),
+            file = log_path,
+            append = TRUE)
+
     rw <- lapply(rs,\(. ).[[1]]) |> 
         bind_rows() |>
         remove_missing()
     rl <- lapply(rs,\(. ).[[2]]) |> 
         bind_rows() |>
         remove_missing()
+
+   cat(paste("Success 2","\n"),
+            file = log_path,
+            append = TRUE)
     
-    write.table(rw, 
+    suppressWarnings(write.table(rw, 
                 resultw_path,
                 append = TRUE,
                 col.names = !file.exists(resultw_path),
-                row.names = FALSE, sep = ",")
-    write.table(rl, 
+                row.names = FALSE, sep = ","))
+    suppressWarnings(write.table(rl, 
                 resultl_path,
                 append = TRUE,
                 col.names = !file.exists(resultl_path),
-                row.names = FALSE, sep = ",")
+                row.names = FALSE, sep = ","))
+
+    cat(paste("Success 3","\n"),
+            file = log_path,
+            append = TRUE)
 
     stopCluster(cl)
 }

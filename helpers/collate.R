@@ -1,5 +1,5 @@
 oldw <- getOption("warn")
-options(warn = -1)
+#options(warn = -1)
 
 suppressMessages(library(tidyverse))
 suppressMessages(library(ggdist))
@@ -32,12 +32,15 @@ time_df=time_df |>
     ungroup()
 
 process <- function(path, par_names) {
-	read_csv(path) %>%
-		select(contains(c("sample", "unit", par_names, "loglik","loglik.se","flag",
-					"time","cond","eff", "iter","run"))) %>% mutate_all(as.numeric) %>% suppressMessages()
+	df_as = read_csv(path) %>% 
+		select(contains(c("sample","unit",par_names,
+				"loglik","loglik.se","flag",
+				"time","cond","eff", "iter","run")))
+	as_var = colnames(df_as)[colnames(df_as)!="unit"]
+	df_as %>% mutate_at(as_var,as.numeric) %>% suppressMessages()
 	}
 
-result_type 			 <- c("results", "traces", "stats")
+result_type <- c("results", "traces", "stats")
 if (isPanel) result_type <- c("results_long", result_type)
 
 summary <- lapply(result_type, function(type)
