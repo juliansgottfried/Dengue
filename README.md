@@ -7,23 +7,26 @@ Run the following lines:
 cd /scratch/$LOGNAME
 git clone https://github.com/juliansgottfried/Dengue.git
 cd Dengue
-bash set_up.sh
+bash cluster_set_up.sh
 ```
 You will be prompted for your email. All subsequent cluster commands should be made from within the Dengue repo.
 
 ### On your computer
 
-Make a new directory. From within the directory, run the following line:
+Change directory to where you want your local copy of the repo.
+Run the following lines:
 ```
-bash <(curl -s https://raw.githubusercontent.com/juliansgottfried/Dengue/refs/heads/main/local_transfer/helpers/set_up.sh)
+git clone https://github.com/juliansgottfried/Dengue.git
+cd Dengue
+bash local_set_up.sh
 ```
-You will be prompted for your HPC username. All subsequent computer commands should be made from within this directory.
+You will be prompted for your HPC username. All subsequent computer commands should be made from within the Dengue repo.
 
 ## To run fitting
 
 **On your computer:**
 
-1. Create a folder for each run, placing them within `fitting_folders`. Name the folders `run_[month]_[day]_[x]`, where `[x]` is a lowercase letter identifying the run. Sequences of runs should have contiguous letters.
+1. Create a folder for each run, placing them within `folders_for_fit`. Name the folders `run_[month]_[day]_[x]`, where `[x]` is a lowercase letter identifying the run. Sequences of runs should have contiguous letters.
 
 2. Inside each folder place a data file `dataset.csv` and an object file `object.R`. See `example_files` for specifications.
 
@@ -39,9 +42,9 @@ You will be prompted for your HPC username. All subsequent computer commands sho
 
 6. Run `bash download.sh`. You will need your HPC password. Each folder within `fitting_folders` should now contain `results.csv`, `stats.csv`, `traces.csv`, `pars.csv`, and, if a panel fit was performed, `results_long.csv`. Additionally, your main directory should now contain the updated file `summary.csv`.
 
-7. To conduct simulations and forecast `plot.png`
+7. Open `analyze.R` and execute the code to generate simulation files and plots.
 
-8. Verify that these files are complete before proceeding with the final step.
+8. Verify that all files are complete before proceeding with the final step.
 
 **On the cluster:**
 
