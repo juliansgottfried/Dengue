@@ -6,7 +6,7 @@ read -p $'Number of initial parameter combinations:\n(MUST be a multiple of 50, 
 read -p $'Time limit (in minutes) for each run:\n(90 is a good first guess, or 360 for panel fits) ' run_time
 read -p $'Number of mif2 refinement runs:\n(0, 1, or 2) ' n_refine
 read -p $'Panel fit?\n(y or n) ' isPanel
-read -p $'Launch only one fit from folders_for_fit, or all?\n(one or all) ' which_fit
+read -p $'Launch only one fit from folders_for_fit, or all:\n(one or all) ' which_fit
 fit_name=""
 if [ $which_fit == "one" ]; then
 	read -p $'fit_name:\n(e.g. run_01_01_a) ' fit_name
