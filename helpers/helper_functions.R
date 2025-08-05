@@ -30,7 +30,7 @@ construct_pomp <- function(path, df) {
 construct_panel_pomp <- function(path, nseq) {
     source(paste0(path,"object.R"))
 
-    df <- read_csv(paste0(path,"dataset.csv"),show_col_types=FALSE)
+    df <- read_csv(paste0(path, "dataset.csv")) |> filter(train)
     df[,loc_key] <- str_remove_all(unlist(df[,loc_key])," ")
 
     locs    <- unname(unlist(df[,loc_key]))

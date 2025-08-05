@@ -22,7 +22,7 @@ path      <- paste0(repo_path, "/folders_for_fit/", fit_name, "/")
 source(paste0(repo_path, "/helpers/helper_functions.R"))
 source(paste0(path, "object.R"))
 
-df        <- read_csv(paste0(path, "dataset.csv"))
+df        <- read_csv(paste0(path, "dataset.csv")) |> filter(train)
 po        <- construct_pomp(path, df)
 pars_path <- paste0(path, "pars.csv")
 
