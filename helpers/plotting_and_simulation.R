@@ -154,16 +154,18 @@ make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 		units = "in") %>% suppressWarnings()
 }
 
-make_panel_plot <- function(path, mle, enso) {
-
+make_panel_plot <- function(path, enso, ordering) {
     source(paste0(path, "object.R"))
     df <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
+
+    results <- read_csv(paste0(path,"results.csv"))
 
     df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
 
-    po                 <- construct_panel_pomp(path,df,NA)
-    po                 <- construct_panel_pomp(path,df,NA)
+    po                 <- construct_panel_pomp(path,500)
+
+    mle <- results %>% select(all_of(names(coef(po)))) %>% slice_head(n=1)
 
     coef(po,names(mle)) <- mle
     
@@ -180,14 +182,14 @@ make_panel_plot <- function(path, mle, enso) {
         obj <- po@unit_objects[[.]]
         coef(obj) <-  c(po@shared,po@specific[,.])
         obj |> simulate(nsim=1000,
-                     include.data=TRUE,
-                     format="data.frame") |>
+                        include.data=TRUE,
+                        format="data.frame") |>
             select(time,.id,all_of(obs_vars)) |>
             mutate(.id=ifelse(.id=="data","data","sim"),
                    unit=.,
                    agg=agg_matches[.]) |>
             mutate_at(obs_vars,set_0)
-        }) |> bind_rows()
+    }) |> bind_rows()
 
     if (enso) {
         enso_bounds <- df |>
@@ -204,10 +206,13 @@ make_panel_plot <- function(path, mle, enso) {
 
     fill_colors  <- c("black","#40d6ed")
     color_colors <- c("black","#16a4ba")
-
+    
     labels   <- c("Data","Simulation")
     bg.color <- "#e6e6e6"
     bg.color <- "white"
+
+    #sims$agg <- factor(sims$agg,levels=c("Northern","Northeastern","Central","Eastern","Southern"))
+    sims$agg <- factor(sims$agg,levels=ordering)
 
     plotter <- ggplot() +
         ggdist::stat_lineribbon(data=sims,
@@ -228,7 +233,7 @@ make_panel_plot <- function(path, mle, enso) {
         guides(color="none",
                fill=guide_legend(title=""))
     
-    if (enso) {
+    iif (enso) {
         plotter <- plotter + 
             new_scale_fill()+
             geom_rect(data=enso_bounds,
@@ -253,13 +258,12 @@ make_panel_plot <- function(path, mle, enso) {
               legend.background=element_rect(fill=bg.color,color=bg.color),
               panel.background=element_rect(fill=bg.color,color=bg.color),
               plot.background=element_rect(fill=bg.color,color=bg.color))+
-        ylim(0,5000)+
-        facet_wrap(aggregate_key,ncol=1)
+        facet_wrap("agg",ncol=1,scales="free_y")
 
     ggsave(filename="plot.png",
            plot = plotter,
            path = path,
            width = 12,
-           height = 3+3*length(unique(region_matches)),
+           height = 3+3*length(unique(agg_matches)),
            units = "in") %>% suppressWarnings()
 }
