@@ -12,7 +12,7 @@ mkdir $path/folders_for_fit
 
 read -p "Enter email: " email
 
-echo "email=$email" > $path/helpers/email.sh
+echo "email=$email" > $path/helpers/user_info.sh
 
 echo ""
 echo "Activating renv..."

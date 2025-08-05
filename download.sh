@@ -1,4 +1,4 @@
-source helpers/username.sh
+source helpers/user_info.sh
 
 mkdir tmp
 ssh-keygen -R dtn.hpc.nyu.edu

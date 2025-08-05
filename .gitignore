@@ -1,5 +1,4 @@
 out
 folders_for_fit
-helpers/email.sh
-helpers/username.sh
+helpers/user_info.sh
 local_analysis/*

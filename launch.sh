@@ -18,7 +18,7 @@ echo "isPanel=$isPanel" > $path/tmp_line3.sh
 cat $path/tmp_line*.sh > $path/hyperparams.sh
 rm $path/tmp_line*.sh
 
-source $path/helpers/email.sh
+source $path/helpers/user_info.sh
 
 if [ $which_fit == "one" ]; then
     echo "Running $fit_name"

@@ -9,7 +9,7 @@
 
 path=/scratch/$LOGNAME/Dengue 
 
-source $path/helpers/email.sh
+source $path/helpers/user_info.sh
 source $path/folders_for_fit/$SLURM_JOB_NAME/hyperparams.sh
 
 module unload r

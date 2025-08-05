@@ -1,6 +1,6 @@
 path=/scratch/$LOGNAME/Dengue 
 
-source $path/helpers/email.sh
+source $path/helpers/user_info.sh
 
 bash $path/helpers/get_times.sh
 
