@@ -1,4 +1,78 @@
+simulate_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
 
+    df   <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE)
+    po   <- construct_pomp(path, df)
+    mle  <- read_csv(paste0(path, "results.csv"), show_col_types=FALSE) %>% head(1)%>% select(all_of(par_names))
+
+	coef(po, names(mle)) <- mle
+	sims      <- po %>% simulate(nsim  = 1000,
+				                include.data = TRUE,
+				                format       = "data.frame")
+
+    sim_states_df        <- sims %>% select(time, .id, all_of(c(state_names, accum_names)))
+    sim_states_df$type   <- "sim_states"
+
+	set_0        <- function(x) (ifelse(is.na(x),0,x))
+	sim_cases_df <- sims %>% select(time,.id, all_of(obs_vars)) %>% mutate_at(obs_vars, set_0)
+
+    if (save_filtered==T){
+
+        filt_sims_states_df      <- pfilter(po, save.states="filter", Np=1000) %>% saved_states(format="data.frame")
+        filt_sims_states_df      <- filt_sims_states_df %>% pivot_wider(names_from="name")
+        filt_sims_states_df$type <- "filter_states"
+        states_df                <- rbind(sim_states_df, filt_sims_states_df)
+
+    } else {
+        states_df <- sim_states_df
+    }
+
+    if (save_sims==T) {
+        write_csv(sim_cases_df, paste0(path, "sim_cases.csv"))
+        write_csv(states_df, paste0(path, "sim_states.csv"))
+    }
+    return(list(states=states_df, sim_cases=sim_cases_df))
+}
+
+## - ## - ##
+forecast_mle <- function(path)
+{
+    source(paste0(path, "object.R"))
+    fcast_df <- read_csv(paste0(path, "dataset_test.csv"), show_col_types=FALSE)
+    po_fcast <- construct_pomp(path, fcast_df)
+
+    if (file.exists(paste0(path, "sim_states.csv"))){
+        states_df <- read_csv(paste0(path, "sim_states.csv"), show_col_types=FALSE)
+        states_df <- states_df[states_df$type == 'filter_states', ]
+
+        if (nrow(states_df) == 0) {
+            states_df <- simulate_mle(path, save_sims=F, save_filtered=T)
+            states_df <- states_df[states_df$type == 'filter_states', ]
+        }
+
+    } else {
+        states_df <- simulate_mle(path, save_sims=F, save_filtered=T)
+        states_df <- states_df[states_df$type == 'filter_states', ]
+    }
+
+    x0             <- states_df[states_df$time == tail(sort(unique(states_df$time)), 1), ]
+    x0             <- x0 %>% select(.id, all_of(c(state_names)))
+    x0             <- x0 %>% pivot_longer(-.id) %>% spread(.id, value) %>% column_to_rownames("name") %>% as.matrix()
+
+    mle                <- read_csv(paste0(path, "results.csv"), show_col_types=FALSE) %>% head(1)%>% select(all_of(par_names))
+    x0                 <- x0 / colSums(x0)
+    rownames(x0)       <- paste0(rownames(x0), "_0")
+    pp                 <- parmat(unlist(mle %>% select(all_of(par_names))), ncol(x0))
+    pp[rownames(x0), ] <- x0
+
+    timezero(po_fcast) <- tail(sort(unique(states_df$time)), 1)
+    forecast           <- po_fcast %>% simulate(params=pp, format="data.frame")
+    fcast_df           <- forecast %>% select(time, .id, all_of(c(state_names, accum_names, obs_vars)))
+    path_to_save_fcast <- paste0(path, "forecast.csv")
+    fcast_df$type      <- "forecast"
+
+    write.csv(fcast_df, path_to_save_fcast, row.names = FALSE)
+    return(fcast_df)
+}
 
 make_plot <- function(sim_cases_data.frame, path_to_save_fig, enso) {
 

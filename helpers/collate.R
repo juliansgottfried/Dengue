@@ -2,18 +2,12 @@ oldw <- getOption("warn")
 #options(warn = -1)
 
 suppressMessages(library(tidyverse))
-suppressMessages(library(ggdist))
-suppressMessages(library(ggnewscale))
-suppressMessages(library(panelPomp))
-
-args      <- commandArgs(trailingOnly=TRUE)
-isPanel   <- args[1]=="y"
 
 log_name  <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/", log_name, "/Dengue")
 
-source(paste0(path_name, "/helpers/helper_functions.R"))
-source(paste0(path_name, "/helpers/plot_functions.R"))
+panel_info = read_csv(paste0(path_name,"/panel_info.csv"),col_names=c("fit","isPanel"))
+panel_info$isPanel <- panel_info$isPanel=="y"
 
 time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |> 
     t() |>
@@ -22,7 +16,7 @@ time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |>
     data.frame()
 colnames(time_df) = c("time", "run")
 
-time_df=time_df |>
+time_df = time_df |>
     mutate(time  = hms(time)) |>
     mutate(hours = hour(time),minutes=minute(time)) |>
     mutate(time  = hours*60+minutes) |>
@@ -40,8 +34,7 @@ process <- function(path, par_names) {
 	df_as %>% mutate_at(as_var,as.numeric) %>% suppressMessages()
 	}
 
-result_type <- c("results", "traces", "stats")
-if (isPanel) result_type <- c("results_long", result_type)
+result_type <- c("results","results_long","traces","stats")
 
 summary <- lapply(result_type, function(type)
 {
@@ -97,8 +90,6 @@ summary <- lapply(result_type, function(type)
 						k			 = k,
 						aic			 = aic,
 						aic_lowIQ	 = aic_lowIQ)
-			mle     <- accum %>% slice(1)	
-
 		}
 		write_csv(accum, paste0(path_name, "/folders_for_fit/",name,"/",type,".csv"))
 		return(summary)
