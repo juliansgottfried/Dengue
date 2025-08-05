@@ -9,15 +9,12 @@ scp -r -o "StrictHostKeyChecking no" \
 mv tmp/summary.csv tmp_summary.csv
 
 paths=(tmp/*)
-touch fit_names.csv
 for path in "${paths[@]}"; do
 	name=$(echo $path | awk -F/ '{print $NF}')
 	mv $path/* folders_for_fit/$name
-	echo $name >> fit_names.csv
 done
 
 rm -r tmp
 
-Rscript helpers/analyze.R
+Rscript helpers/bind.R
 rm tmp_summary.csv
-rm fit_names.csv

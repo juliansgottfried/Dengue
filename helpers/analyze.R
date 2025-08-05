@@ -2,16 +2,7 @@ library(tidyverse)
 
 source("helpers/local_helpers.R")
 
-tmp <- read_csv("tmp_summary.csv")
-if (file.exists("summary.csv")) {
-	main <- read_csv("summary.csv")
-	main <- rbind(main[,2:ncol(main)],tmp)
-} else {
-	main <- tmp
-}
-write_csv(main,"summary.csv")
-
-fit_names <- unlist(read_csv("fit_names.csv",col_names=F))
+fit_names <- unlist(read_csv("new_fits.csv",col_names=F))
 
 for (name in fit_names) {
     #name <- "run_7_17_j"

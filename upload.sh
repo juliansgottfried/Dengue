@@ -1,5 +1,7 @@
 source helpers/user_info.sh
 
+rm new_fits.csv
+
 touch tmp.txt
 
 read -p $'Upload sequence of runs or pick specific runs:\n(seq or spec) ' upload_config
@@ -69,8 +71,10 @@ rm tmp.txt
 
 mkdir tmp
 
+touch new_fits.csv
 for name in "${names[@]}"; do
 	cp -r folders_for_fit/$name tmp
+	echo $name >> new_fits.csv
 done
 
 ssh-keygen -R dtn.hpc.nyu.edu
