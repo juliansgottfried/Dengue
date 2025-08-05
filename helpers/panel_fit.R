@@ -19,7 +19,7 @@ log_name  <- Sys.getenv("LOGNAME")
 repo_path <- paste0("/scratch/",log_name,"/Dengue")
 path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
-source(paste0(repo_path,"/helpers/helper_functions.R"))
+source(paste0(repo_path,"/helpers/cluster_helpers.R"))
 source(paste0(path,"object.R"))
 
 ppo <- construct_panel_pomp(path,nseq)

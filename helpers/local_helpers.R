@@ -1,9 +1,13 @@
 simulate_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
 
-    df   <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE) |> filter(train)
+    df   <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE) |> 
+        suppressMessages() |>
+        filter(train)
     
     po   <- construct_pomp(path, df)
-    mle  <- read_csv(paste0(path, "results.csv"), show_col_types=FALSE) %>% head(1) %>% select(all_of(par_names))
+    mle  <- read_csv(paste0(path, "results.csv"), show_col_types=FALSE) %>% 
+        suppressMessages() |>
+        head(1) %>% select(all_of(par_names))
 
 	coef(po, names(mle)) <- mle
 	sims      <- po %>% simulate(nsim  = 1000,
@@ -37,9 +41,12 @@ simulate_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
 simulate_panel_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
 
     source(paste0(path, "object.R"))
-    df <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE) |> filter(train)
+    df <- read_csv(paste0(path, "dataset.csv"), show_col_types=FALSE) |> 
+        suppressMessages() |>
+        filter(train)
     
-    results <- read_csv(paste0(path,"results.csv"))
+    results <- read_csv(paste0(path,"results.csv")) |> 
+        suppressMessages()
     
     df[,loc_key]       <- str_remove_all(unlist(df[,loc_key])," ")
     df[,aggregate_key] <- str_remove_all(unlist(df[,aggregate_key])," ")
@@ -70,10 +77,10 @@ simulate_panel_mle <- function(path, save_sims=TRUE, save_filtered = TRUE) {
             mutate_at(obs_vars,set_0)
     }) |> bind_rows()
 
-    sim_states_df        <- sims %>% select(time, .id, unit,agg,all_of(c(state_names, accum_names)))
+    sim_states_df        <- sims %>% select(time, .id, unit, agg, all_of(c(state_names, accum_names)))
     sim_states_df$type   <- "sim_states"
     
-    sim_cases_df <- sims %>% select(time,.id, all_of(obs_vars))
+    sim_cases_df <- sims %>% select(time, .id, unit, agg, all_of(obs_vars))
     
     if (save_filtered==T){
         filt_sims_states_df <- lapply(keys, \(.) {
@@ -140,12 +147,12 @@ forecast_mle <- function(path)
     return(fcast_df)
 }
 
-sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso) {
+sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso_df) {
 	sims_cases <- sim_cases_dataframe %>%
                     mutate(.id=ifelse(.id=="data", "data", "sim")) 
 
-	if (enso) {
-		enso_bounds <- df %>%
+	if (length(enso_df)!=0) {
+		enso_bounds <- enso_df %>%
     			filter(!is.na(cases)) %>%
     			mutate(enso=nino+nina) %>%
     			select(time,enso) %>%
@@ -181,7 +188,7 @@ sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso) {
 		guides(color="none",
 			fill=guide_legend(title=""))
 
-	if (enso) {
+	if (length(enso_df)!=0) {
 		plotter <- plotter   +
 		    new_scale_fill() +
     			geom_rect(data=enso_bounds,
@@ -217,17 +224,17 @@ sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso) {
 		units = "in") %>% suppressWarnings()
 }
 
-panel_sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso, ordering) {
+panel_sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso_df, ordering) {
     sims_cases <- sim_cases_dataframe %>%
         mutate(.id=ifelse(.id=="data", "data", "sim")) 
 
-    if (enso) {
-        enso_bounds <- df |>
+    if (length(enso_df)!=0) {
+        enso_bounds <- enso_df |>
             filter(!is.na(cases)) |>
             mutate(enso=nino+nina) |>
             select(time,enso) |>
             distinct() |>
-            mutate(upper=sims |>
+            mutate(upper=sims_cases |>
                        filter(.id!="data") |>
                        group_by(time)|>
                        summarize(upper=quantile(cases,0.95))|>
@@ -241,11 +248,10 @@ panel_sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso, ordering
     bg.color <- "#e6e6e6"
     bg.color <- "white"
 
-    #sims$agg <- factor(sims$agg,levels=c("Northern","Northeastern","Central","Eastern","Southern"))
-    sims$agg <- factor(sims$agg,levels=ordering)
+    sims_cases$agg <- factor(sims_cases$agg,levels=ordering)
 
     plotter <- ggplot() +
-        ggdist::stat_lineribbon(data=sims,
+        ggdist::stat_lineribbon(data=sims_cases,
                                 mapping=aes(x=time,
                                             y=cases,
                                             color=.id,
@@ -263,7 +269,7 @@ panel_sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso, ordering
         guides(color="none",
                fill=guide_legend(title=""))
     
-    iif (enso) {
+    if (length(enso_df)!=0) {
         plotter <- plotter + 
             new_scale_fill()+
             geom_rect(data=enso_bounds,
@@ -300,11 +306,12 @@ panel_sim_plot <- function(sim_cases_dataframe, path_to_save_fig, enso, ordering
 
 plot_trace <- function(path,
                        plot_pars,
-                       plot_lik=T,
                        plot_mean=F) {
     
     #plot_pars <- c("S_0","muEI","muRS","I_0","R_0","muRS")
-    if (plot_lik) plot_pars <- c(plot_pars,"loglik")
+    if (length(plot_pars)==0) {
+        plot_pars <- "loglik"
+    } else plot_pars <- c(plot_pars,"loglik")
     
     plot_rows <- 2
     plot_cols = ceiling(length(plot_pars)/plot_rows)
@@ -340,9 +347,9 @@ plot_trace <- function(path,
     ggsave(filename="traceplot.png",
            plot = traceplot,
            path = path,
-           width = plot_cols*3,
+           width = plot_cols*6,
            height = 6,
-           units = "in") %>% suppressWarnings()
+           units = "in") %>% suppressMessages()
     
     #traces %>% 
     #    select(value=muIR,loglik) %>% 
@@ -354,14 +361,15 @@ plot_trace <- function(path,
 }
 
 plot_stats <- function(path,plot_mean=F) {
-    stats <- read_csv(paste0(path,"stats.csv"))
+    stats <- read_csv(paste0(path,"stats.csv")) %>% suppressMessages()
     statplot <- stats %>% 
         pivot_longer(cols=c(cond,eff)) %>% 
         group_by(name,time) %>% 
         summarize(mean=mean(value),
                   median=median(value),
                   upper=quantile(value,0.975),
-                  lower=quantile(value,0.025)) %>% 
+                  lower=quantile(value,0.025)) %>%
+        suppressMessages() %>% 
         ggplot(aes(x=time))+
         geom_ribbon(aes(ymin=lower,ymax=upper),alpha=0.3)+
         geom_line(aes(y=median),linewidth=0.5,color="#4f4f4f")+
@@ -380,5 +388,5 @@ plot_stats <- function(path,plot_mean=F) {
            path = path,
            width = 12,
            height = 6,
-           units = "in") %>% suppressWarnings()
+           units = "in") %>% suppressMessages()
 }

@@ -3,3 +3,4 @@ folders_for_fit
 helpers/user_info.sh
 local_analysis/*
 .DS_store
+summary.csv
