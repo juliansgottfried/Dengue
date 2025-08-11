@@ -6,8 +6,7 @@ suppressMessages(library(tidyverse))
 log_name  <- Sys.getenv("LOGNAME")
 path_name <- paste0("/scratch/", log_name, "/Dengue")
 
-panel_info = read_csv(paste0(path_name,"/panel_info.csv"),col_names=c("fit","isPanel"))
-panel_info$isPanel <- panel_info$isPanel=="y"
+panel_info = read_csv(paste0(path_name,"/fit_info.csv"),col_names=c("fit","fitType"))
 
 time_df = read.table(paste0(path_name,"/times.txt"), sep=" ") |> 
     t() |>

@@ -74,7 +74,7 @@ construct_spatpomp <- function(path) {
         t0 = df$time[1]-dt,
         unit_statenames = c(state_names,accum_names),
         unit_accumvars = accum_names,
-        paramnames = par_names,
+        paramnames = basic_par_names,
         rinit = rinit,
         rprocess = euler(rproc, delta.t=dt),
         dunit_measure = dunit_meas,

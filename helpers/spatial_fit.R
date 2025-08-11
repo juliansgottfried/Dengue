@@ -45,7 +45,7 @@ if (!file.exists(pars_path)) {
     shared_init <- init_vals[,paste0(shared_pars,"1")]
     shared_init <- map2(1:ncol(shared_init),colnames(shared_init),\(x,y) {
         duplicated <- suppressMessages(bind_cols(replicate(U,shared_init[,x])))
-        names(duplicated) <- expanded_par_list[[str_sub(y,1,-2)]]
+        names(duplicated) <- par_list[[str_sub(y,1,-2)]]
         duplicated
         }) %>% bind_cols()
     specific_init <- init_vals[,unname(unlist(par_list[c(specific_pars)]))]

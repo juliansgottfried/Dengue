@@ -16,8 +16,10 @@ module unload r
 module unload gcc
 module load r/gcc/4.3.1
 
-if [ "$isPanel" = "y" ]; then
+if [ "$fitType" = "p" ]; then
 	suffix="panel_"
+elif [ "$fitType" = "s" ]; then
+	suffix="spatial_"
 else
 	suffix=""
 fi
