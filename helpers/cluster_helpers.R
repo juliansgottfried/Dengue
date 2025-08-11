@@ -79,6 +79,8 @@ construct_spatpomp <- function(path) {
         rprocess = euler(rproc, delta.t=dt),
         dunit_measure = dunit_meas,
         runit_measure = runit_meas,
+        dmeasure = dmeas,
+        rmeasure = rmeas,
         globals = global_vals,
         partrans = parameter_trans(
             log = log_transf,
@@ -335,34 +337,28 @@ run_panel_fitting <- function(
     stopCluster(cl)
 }
 
-run_spatial_fitting <- function(
-        po, n_cores, parameters,
-        seed_num, rdd1, rdd2, rdd3,
-        n_refine,
-        Np1, Np2, Nmif,block_list,
-        result_path,
-        log_path,
-        traces_path,
-        stats_path) {
+run_spatial_fitting <- function(po,n_cores,parameters,
+                                unitParNames,sharedParNames,
+                                seed_num,
+                                rdd1,rdd2,rdd3,
+                                n_refine,Np1,Np2,Nbpf,
+                                block_size=2,
+                                result_path,log_path,traces_path,stats_path
+                                ) {
     
-    po=spo
-    n_cores=n_cores
-    parameters=init_vals
-    unitParNames=specific_pars
-    sharedParNames=shared_pars
-    seed_num=seed
-    rdd1=rdd1
-    rdd2=rdd2
-    rdd3=rdd3
-    n_refine=1
-    Np1=5
-    Np2=5
-    Nbpf=1
-    block_size=2
-    result_path=paste0(path,"results.csv")
-    log_path=paste0(path,"log.txt")
-    traces_path=paste0(path,"traces.csv")
-    stats_path=paste0(path,"stats.csv")
+    #po=spo
+    #parameters=init_vals
+    #unitParNames=est_specific
+    #sharedParNames=est_shared
+    #seed_num=seed
+    #Np1=5
+    #Np2=5
+    #Nbpf=3
+    #block_size=2
+    #result_path=paste0(path,"results.csv")
+    #log_path=paste0(path,"log.txt")
+    #traces_path=paste0(path,"traces.csv")
+    #stats_path=paste0(path,"stats.csv")
     
     cl <- parallel::makeCluster(n_cores)
     registerDoParallel(cl)
@@ -371,10 +367,14 @@ run_spatial_fitting <- function(
     ## for each parameter row, run ibpf
     r1 <- foreach::foreach(
         i = seq_len(nrow(parameters)),
-        .packages = c("panelPomp", "dplyr", "readr")
+        .packages = c("spatPomp", "dplyr", "readr")
     ) %dopar% {
         param <- as.numeric(parameters[i, ])
         names(param) <- colnames(parameters)
+        
+        #coef(po) <- param
+        #sim <- po %>% simulate(nsim=10,format="data.frame")
+        #bpfs <- po %>% bpfilter(Np=10,block_size=2,save_states=T)
         
         cat(paste("Starting iteration", i, "\n"),
             file = log_path,
@@ -388,9 +388,9 @@ run_spatial_fitting <- function(
                                     cooling.type = "geometric",
                                     cooling.fraction.50 = 0.5,
                                     params = param,
-                                    unitParNames=unitParNames,
-                                    sharedParNames=sharedParNames,
-                                    spat_regression=0.1,
+                                    unitParNames = unitParNames,
+                                    sharedParNames = sharedParNames,
+                                    spat_regression = 0.1,
                                     block_size = block_size,
                                     rw.sd = rdds[[1]]),
                            error = function(e) e)
@@ -403,16 +403,9 @@ run_spatial_fitting <- function(
         
         if (n_refine > 0) {
             for (j in 1:n_refine) {
-                bpfout <- bpfout |> ibpf(Np = Np1,
-                                         Nbpf = Nbpf,
-                                         cooling.type = "geometric",
-                                         cooling.fraction.50 = 0.5,
-                                         params = param,
-                                         unitParNames=unitParNames,
-                                         sharedParNames=sharedParNames,
-                                         spat_regression=0.1,
-                                         block_size = block_size,
-                                         rw.sd=rdds[[j+1]])
+                bpfout <- bpfout |> ibpf(rw.sd = rdds[[j+1]],
+                                         unitParNames = unitParNames,
+                                         sharedParNames = sharedParNames)
                 traces_j <- get_trace(j+1)
                 traces <- bind_rows(traces,traces_j)
             }
@@ -436,9 +429,10 @@ run_spatial_fitting <- function(
 
         if (length(coef(bpfout)) > 0) {
             loglik_bpf <- tryCatch(replicate(n = 10,
-                                             logLik(pfilter(po,
-                                                            params = coef(bpfout),
-                                                            Np = Np2))),
+                                             logLik(bpfilter(po,
+                                                             params = coef(bpfout),
+                                                             Np = Np2,
+                                                             block_size = 2))),
                                    error = function(e) e)
             
             if (is.numeric(loglik_bpf)) {

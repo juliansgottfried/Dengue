@@ -19,7 +19,7 @@ n_array <- 1
 array_id <- 1
 n_cores <- detectCores()
 fit_name <- "run_8_6_a"
-n_refine <- 2
+n_refine <- 1
 nseq <- n_cores
 
 #log_name  <- Sys.getenv("LOGNAME")
@@ -42,11 +42,11 @@ if (!file.exists(pars_path)) {
         lower=unlist(param_df[1,]),
         upper=unlist(param_df[2,]),
         nseq=nseq)
-    shared_init <- init_vals[,shared_pars]
+    shared_init <- init_vals[,paste0(shared_pars,"1")]
     shared_init <- map2(1:ncol(shared_init),colnames(shared_init),\(x,y) {
-        repped <- suppressMessages(bind_cols(replicate(U,shared_init[,x])))
-        names(repped) <- expanded_par_list[[y]]
-        repped
+        duplicated <- suppressMessages(bind_cols(replicate(U,shared_init[,x])))
+        names(duplicated) <- expanded_par_list[[str_sub(y,1,-2)]]
+        duplicated
         }) %>% bind_cols()
     specific_init <- init_vals[,unname(unlist(par_list[c(specific_pars)]))]
     init_vals <- bind_cols(specific_init,shared_init)
@@ -72,15 +72,20 @@ lapply(1:3,function(i) {
         eval.parent
 })
 
+est_pars_basic <- paste0(unique(unlist(lapply(str_split(est_pars,"_"),\(.) .[1]))),"_")
+
+est_shared <- shared_pars[shared_pars%in%est_pars_basic]
+est_specific <- specific_pars[specific_pars%in%est_pars_basic]
+
 run_spatial_fitting(po=spo,
             n_cores=n_cores,
             parameters=init_vals,
-            unitParNames=names(specific_list),
-            sharedParNames=names(shared_list),
+            unitParNames=est_specific,
+            sharedParNames=est_shared,
             seed_num=seed,
             rdd1=rdd1,rdd2=rdd2,rdd3=rdd3,
 	        n_refine=n_refine,
-            Np1=5,Np2=5,Nmif=5,
+            Np1=5,Np2=5,Nbpf=5,
             block_size=2,
             result_path=paste0(path,"results.csv"),
             log_path=paste0(path,"log.txt"),
