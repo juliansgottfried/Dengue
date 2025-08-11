@@ -1,4 +1,4 @@
-oldw <- getOption("warn")
+#oldw <- getOption("warn")
 #options(warn = -1)
 
 suppressMessages(library(tidyverse))
@@ -35,14 +35,14 @@ process <- function(path, par_names) {
 
 result_type <- c("results","results_long","traces","stats")
 
-summary <- lapply(result_type, function(type)
+lapply(result_type, function(type)
 {
     print(paste0(toupper(type)))
 
     paths  <- list.files(paste0(path_name,"/out/",type),full.names=T)
     names  <- list.files(paste0(path_name,"/out/",type),full.names=F)
 
-    summary <- map2(paths, names, function(path, name) {
+  	map2(paths, names, function(path, name) {
         print(paste0(name))
 
 		fitting_folder_path <- paste0(path_name, "/folders_for_fit/", name, "/")
@@ -66,8 +66,6 @@ summary <- lapply(result_type, function(type)
 			}
 		}
 
-		summary = NULL
-
 		if (type=="results")
 		{
 			accum['ll_lowIQ'] <- accum$loglik - 0.6745 * accum$loglik.se
@@ -89,15 +87,10 @@ summary <- lapply(result_type, function(type)
 						k			 = k,
 						aic			 = aic,
 						aic_lowIQ	 = aic_lowIQ)
+			write_csv(summary,paste0(fitting_folder_path,"summary.csv"))
 		}
 		write_csv(accum, paste0(path_name, "/folders_for_fit/",name,"/",type,".csv"))
-		return(summary)
-    }
-	)
-    return(summary)
+    })
 })
 
-summary_data <- bind_rows(summary[[1]])
-write_csv(summary_data,paste0(path_name, "/folders_for_fit/summary.csv"))
-
-options(warn = oldw)
+#options(warn = oldw)
