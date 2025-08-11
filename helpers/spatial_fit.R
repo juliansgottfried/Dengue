@@ -19,7 +19,7 @@ nseq <- as.numeric(args[6])
 #array_id <- 1
 #n_cores <- detectCores()
 #fit_name <- "run_8_6_a"
-#n_refine <- 1
+#n_refine <- 0
 #nseq <- n_cores
 
 log_name  <- Sys.getenv("LOGNAME")
@@ -85,9 +85,10 @@ run_spatial_fitting(po=spo,
             seed_num=seed,
             rdd1=rdd1,rdd2=rdd2,rdd3=rdd3,
 	        n_refine=n_refine,
-            Np1=5,Np2=5,Nbpf=5,
+            Np1=1000,Np2=2000,Nbpf=50,
             block_size=2,
-            result_path=paste0(repo_path,"/out/results/",fit_name,"/",as.character(array_id),".csv"),
+            resultw_path=paste0(repo_path,"/out/results/",fit_name,"/",as.character(array_id),".csv"),
+            resultl_path=paste0(repo_path,"/out/results_long/",fit_name,"/",as.character(array_id),".csv"),
             log_path=paste0(repo_path,"/out/log/",fit_name,"/",as.character(array_id),".txt"),
             traces_path=paste0(repo_path,"/out/traces/",fit_name,"/",as.character(array_id),".csv"),
             stats_path=paste0(repo_path,"/out/stats/",fit_name,"/",as.character(array_id),".csv"))
