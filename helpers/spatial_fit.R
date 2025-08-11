@@ -6,28 +6,28 @@ library(doRNG)
 seed <- 9087235
 set.seed(seed)
 
-#args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly=TRUE)
 
-#n_array <- as.numeric(args[1])
-#array_id <- as.numeric(args[2])
-#n_cores <- as.numeric(args[3])
-#fit_name <- args[4]
-#n_refine <- as.numeric(args[5])
-#nseq <- as.numeric(args[6])
+n_array <- as.numeric(args[1])
+array_id <- as.numeric(args[2])
+n_cores <- as.numeric(args[3])
+fit_name <- args[4]
+n_refine <- as.numeric(args[5])
+nseq <- as.numeric(args[6])
 
-n_array <- 1
-array_id <- 1
-n_cores <- detectCores()
-fit_name <- "run_8_6_a"
-n_refine <- 1
-nseq <- n_cores
+#n_array <- 1
+#array_id <- 1
+#n_cores <- detectCores()
+#fit_name <- "run_8_6_a"
+#n_refine <- 1
+#nseq <- n_cores
 
-#log_name  <- Sys.getenv("LOGNAME")
-#repo_path <- paste0("/scratch/",log_name,"/Dengue")
-#path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+log_name  <- Sys.getenv("LOGNAME")
+repo_path <- paste0("/scratch/",log_name,"/Dengue")
+path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
-repo_path <- "~/Desktop/Dengue"
-path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+#repo_path <- "~/Desktop/Dengue"
+#path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
 source(paste0(repo_path,"/helpers/cluster_helpers.R"))
 source(paste0(path,"object.R"))
@@ -87,7 +87,7 @@ run_spatial_fitting(po=spo,
 	        n_refine=n_refine,
             Np1=5,Np2=5,Nbpf=5,
             block_size=2,
-            result_path=paste0(path,"results.csv"),
-            log_path=paste0(path,"log.txt"),
-	        traces_path=paste0(path,"traces.csv"),
-            stats_path=paste0(path,"stats.csv"))
+            result_path=paste0(repo_path,"/out/results/",fit_name,"/",as.character(array_id),".csv"),
+            log_path=paste0(repo_path,"/out/log/",fit_name,"/",as.character(array_id),".txt"),
+            traces_path=paste0(repo_path,"/out/traces/",fit_name,"/",as.character(array_id),".csv"),
+            stats_path=paste0(repo_path,"/out/stats/",fit_name,"/",as.character(array_id),".csv"))
