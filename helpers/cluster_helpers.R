@@ -27,7 +27,7 @@ construct_pomp <- function(path, df) {
 	return(po)
 }
 
-construct_panel_pomp <- function(path, nseq) {
+construct_panelpomp <- function(path, nseq) {
     source(paste0(path,"object.R"))
 
     df <- read_csv(paste0(path, "dataset.csv")) |> filter(train)
@@ -57,6 +57,34 @@ construct_panel_pomp <- function(path, nseq) {
     
     ppo <- panelPomp(tmp_ppo,params=unlist(init_vals[1,]))
     return(ppo)
+}
+
+construct_spatpomp <- function(path) {
+    df <- read_csv(paste0(path,"dataset.csv"))
+    
+    source(paste0(path,"object.R"))
+    
+    dt <- 1/365
+    
+    spo <- spatPomp(
+        data = df %>% select(all_of(c(time_name,unit_name,obs_name))) %>% na.omit,
+        covar = df %>% select(all_of(c(time_name,unit_name,covar_names))),
+        times = time_name,
+        units = unit_name,
+        t0 = df$time[1]-dt,
+        unit_statenames = c(state_names,accum_names),
+        unit_accumvars = accum_names,
+        paramnames = par_names,
+        rinit = rinit,
+        rprocess = euler(rproc, delta.t=dt),
+        dunit_measure = dunit_meas,
+        runit_measure = runit_meas,
+        globals = global_vals,
+        partrans = parameter_trans(
+            log = log_transf,
+            logit = logit_transf,
+            barycentric = barycentric_transf)
+    )
 }
 
 run_fitting <- function(
@@ -286,10 +314,6 @@ run_panel_fitting <- function(
         list(resultw,resultl)
     }
 	
-    cat(paste("Success 1","\n"),
-            file = log_path,
-            append = TRUE)
-
     rw <- lapply(rs,\(. ).[[1]]) |> 
         bind_rows() |>
         remove_missing()
@@ -297,10 +321,6 @@ run_panel_fitting <- function(
         bind_rows() |>
         remove_missing()
 
-   cat(paste("Success 2","\n"),
-            file = log_path,
-            append = TRUE)
-    
     suppressWarnings(write.table(rw, 
                 resultw_path,
                 append = TRUE,
@@ -312,9 +332,145 @@ run_panel_fitting <- function(
                 col.names = !file.exists(resultl_path),
                 row.names = FALSE, sep = ","))
 
-    cat(paste("Success 3","\n"),
+    stopCluster(cl)
+}
+
+run_spatial_fitting <- function(
+        po, n_cores, parameters,
+        seed_num, rdd1, rdd2, rdd3,
+        n_refine,
+        Np1, Np2, Nmif,block_list,
+        result_path,
+        log_path,
+        traces_path,
+        stats_path) {
+    
+    po=spo
+    n_cores=n_cores
+    parameters=init_vals
+    unitParNames=specific_pars
+    sharedParNames=shared_pars
+    seed_num=seed
+    rdd1=rdd1
+    rdd2=rdd2
+    rdd3=rdd3
+    n_refine=1
+    Np1=5
+    Np2=5
+    Nbpf=1
+    block_size=2
+    result_path=paste0(path,"results.csv")
+    log_path=paste0(path,"log.txt")
+    traces_path=paste0(path,"traces.csv")
+    stats_path=paste0(path,"stats.csv")
+    
+    cl <- parallel::makeCluster(n_cores)
+    registerDoParallel(cl)
+    registerDoRNG(seed = as.integer(round(abs(seed_num))) + 1234)
+    
+    ## for each parameter row, run ibpf
+    r1 <- foreach::foreach(
+        i = seq_len(nrow(parameters)),
+        .packages = c("panelPomp", "dplyr", "readr")
+    ) %dopar% {
+        param <- as.numeric(parameters[i, ])
+        names(param) <- colnames(parameters)
+        
+        cat(paste("Starting iteration", i, "\n"),
             file = log_path,
             append = TRUE)
+        
+        rdds = list(rdd1,rdd2,rdd3)
+        
+        bpfout <- tryCatch(po |>
+                               ibpf(Np = Np1,
+                                    Nbpf = Nbpf,
+                                    cooling.type = "geometric",
+                                    cooling.fraction.50 = 0.5,
+                                    params = param,
+                                    unitParNames=unitParNames,
+                                    sharedParNames=sharedParNames,
+                                    spat_regression=0.1,
+                                    block_size = block_size,
+                                    rw.sd = rdds[[1]]),
+                           error = function(e) e)
+        
+        get_trace <- function(i) {
+            cbind(as.data.frame(bpfout@traces),data.frame(iter=0:Nbpf,run=i))
+        }
+        
+        traces <- get_trace(1)
+        
+        if (n_refine > 0) {
+            for (j in 1:n_refine) {
+                bpfout <- bpfout |> ibpf(Np = Np1,
+                                         Nbpf = Nbpf,
+                                         cooling.type = "geometric",
+                                         cooling.fraction.50 = 0.5,
+                                         params = param,
+                                         unitParNames=unitParNames,
+                                         sharedParNames=sharedParNames,
+                                         spat_regression=0.1,
+                                         block_size = block_size,
+                                         rw.sd=rdds[[j+1]])
+                traces_j <- get_trace(j+1)
+                traces <- bind_rows(traces,traces_j)
+            }
+        }
+        
+        if (file.exists(traces_path)) {
+            read_csv(traces_path) %>% bind_rows(traces) %>% write_csv(traces_path)
+        } else write_csv(traces,traces_path)
+        
+        stats <- data.frame(cond=bpfout@cond.loglik,time=bpfout@times)
+        
+        if (file.exists(stats_path)) {
+            read_csv(stats_path) %>% bind_rows(stats) %>% write_csv(stats_path)
+        } else write_csv(stats,stats_path)
+        
+        result <- c(rep(NA, length(param) + 4))
+        names(result) <- c("sample",colnames(parameters),
+                            "loglik","loglik.se","flag")
+        
+        result["sample"] <- i
 
+        if (length(coef(bpfout)) > 0) {
+            loglik_bpf <- tryCatch(replicate(n = 10,
+                                             logLik(pfilter(po,
+                                                            params = coef(bpfout),
+                                                            Np = Np2))),
+                                   error = function(e) e)
+            
+            if (is.numeric(loglik_bpf)) {
+                bl <- logmeanexp(loglik_bpf, se = TRUE)
+                names(bl) <- c("loglik","loglik.se")
+                loglik_bpf_est <- bl[1]
+                cat(paste(i, loglik_bpf_est, "\n"), file = log_path, append = TRUE)
+                
+                result["flag"] <- 2
+            }
+            if (is.numeric(loglik_bpf)) {
+                result[names(bl)] <- bl
+                result["flag"] <- 1
+
+                par_out <- coef(bpfout)
+                result[names(par_out)] <- par_out
+            }
+        } else {
+            result["flag"] <- 3
+            cat(paste(i, "failed", "\n"), file = log_path, append = TRUE)
+        }
+        result
+    }
+    
+    r1 <- r1 |>
+        bind_rows() |>
+        remove_missing()
+    write.table(r1,
+                result_path,
+                append = TRUE,
+                col.names = !file.exists(result_path),
+                row.names = FALSE, sep = ",")
+    
     stopCluster(cl)
 }
