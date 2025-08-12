@@ -63,11 +63,11 @@ rproc <- spatPomp_Csnippet(
             I[u] = I[u]>0 ? floor(I[u]) : 0;
             R[u] = R[u]>0 ? floor(R[u]) : 0;
             
-            S[u] += (dpopdt[u] + pop[u]*delta_[0] - beta_[0]*S[u]*I[u]/pop[u] - delta_[0]*S[u])*dt;
-            I += (beta_[0]*S[u]*I[u]/pop[u] - gamma_[0]*I[u] - delta_[0]*I[u])*dt;
-            R += (gamma_[0]*I[u] - delta_[0]*R[u])*dt;
+            S[u] += (dpopdt[u] + pop[u]*delta_[u] - beta_[u]*S[u]*I[u]/pop[u] - delta_[u]*S[u])*dt;
+            I += (beta_[u]*S[u]*I[u]/pop[u] - gamma_[u]*I[u] - delta_[u]*I[u])*dt;
+            R += (gamma_[u]*I[u] - delta_[u]*R[u])*dt;
             
-            C += rho_[u]*(beta_[0]*S[u]*I[u]/pop[u])*dt;
+            C += rho_[u]*(beta_[u]*S[u]*I[u]/pop[u])*dt;
         }
 ")
 

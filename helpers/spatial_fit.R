@@ -6,28 +6,28 @@ library(doRNG)
 seed <- 9087235
 set.seed(seed)
 
-args <- commandArgs(trailingOnly=TRUE)
+#args <- commandArgs(trailingOnly=TRUE)
 
-n_array <- as.numeric(args[1])
-array_id <- as.numeric(args[2])
-n_cores <- as.numeric(args[3])
-fit_name <- args[4]
-n_refine <- as.numeric(args[5])
-nseq <- as.numeric(args[6])
+#n_array <- as.numeric(args[1])
+#array_id <- as.numeric(args[2])
+#n_cores <- as.numeric(args[3])
+#fit_name <- args[4]
+#n_refine <- as.numeric(args[5])
+#nseq <- as.numeric(args[6])
 
-#n_array <- 1
-#array_id <- 1
-#n_cores <- detectCores()
-#fit_name <- "run_8_6_a"
-#n_refine <- 0
-#nseq <- n_cores
+n_array <- 1
+array_id <- 1
+n_cores <- detectCores()
+fit_name <- "run_8_6_a"
+n_refine <- 1
+nseq <- n_cores
 
-log_name  <- Sys.getenv("LOGNAME")
-repo_path <- paste0("/scratch/",log_name,"/Dengue")
-path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+#log_name  <- Sys.getenv("LOGNAME")
+#repo_path <- paste0("/scratch/",log_name,"/Dengue")
+#path      <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
-#repo_path <- "~/Desktop/Dengue"
-#path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
+repo_path <- "~/Desktop/Dengue"
+path <- paste0(repo_path,"/folders_for_fit/",fit_name,"/")
 
 source(paste0(repo_path,"/helpers/cluster_helpers.R"))
 
@@ -37,12 +37,10 @@ source(paste0(path,"object.R"))
 U <- nrow(unique(df[,unit_name]))
 par_list <- setNames(lapply(paste0(c(specific_pars,shared_pars),"_"),\(.) paste0(rep(.,U),1:U)),
                      c(specific_pars,shared_pars))
-
 basic_par_list <- c(par_list[c(specific_pars)],
                     lapply(par_list[c(shared_pars)],\(.) .[1]))
-basic_par_names <- unname(unlist(basic_par_list))
 
-get_transf <- function(pars) {unname(unlist(basic_par_list[pars]))}
+get_transf <- function(pars) {unname(unlist(par_list[pars]))}
 log_transf <- get_transf(log_transf)
 logit_transf <- get_transf(logit_transf)
 barycentric_transf <- get_transf(barycentric_transf)
@@ -52,7 +50,8 @@ par_trans <- parameter_trans(
     logit = logit_transf,
     barycentric = barycentric_transf)
 
-spo <- construct_spatpomp(path,df,basic_par_names,par_trans)
+spo <- construct_spatpomp(path,df,
+                          unname(unlist(par_list)),par_trans)
 
 bounds_df <- unlist(lapply(names(param_bounds),\(.) {
     params <- basic_par_list[[.]]
@@ -76,8 +75,8 @@ if (!file.exists(pars_path)) {
 len <- nseq/n_array
 init_vals <- init_vals[((array_id-1)*len+1):(array_id*len),]
 
-non_ivp <- c(0.02,0.01,0.001)
-ivp     <- c(0.01,0.005,0.001)
+non_ivp <- c(0.005,0.00125,0.00125)
+ivp     <- c(0.005,0.00125,0.00125)
 
 est_pars <- names(bounds_df)[bounds_df[1,]-bounds_df[2,]!=0]
 est_pars_cut <- unlist(lapply(str_split(est_pars,"_"),\(.) .[1]))
@@ -105,7 +104,7 @@ run_spatial_fitting(po=spo,
             seed_num=seed,
             rdd1=rdd1,rdd2=rdd2,rdd3=rdd3,
 	        n_refine=n_refine,
-            Np1=5,Np2=5,Nbpf=1,
+            Np1=1000,Np2=2000,Nbpf=50,
             block_size=2,
             resultw_path=paste0(repo_path,"/out/results/",fit_name,"/",as.character(array_id),".csv"),
             resultl_path=paste0(repo_path,"/out/results_long/",fit_name,"/",as.character(array_id),".csv"),

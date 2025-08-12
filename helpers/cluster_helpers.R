@@ -30,13 +30,13 @@ construct_panelpomp <- function(path, nseq) {
     source(paste0(path,"object.R"))
 
     df <- read_csv(paste0(path, "dataset.csv")) |> filter(train)
-    df[,loc_key] <- str_remove_all(unlist(df[,loc_key])," ")
+    df[,unit_name] <- str_remove_all(unlist(df[,unit_name])," ")
 
-    locs    <- unname(unlist(df[,loc_key]))
+    locs    <- unname(unlist(df[,unit_name]))
     keys    <- unique(locs)
     tmp_ppo <- lapply(keys,function(x)
     {
-        tmp_df = df[locs==x,] %>% select(-all_of(loc_key))
+        tmp_df = df[locs==x,] %>% select(-all_of(unit_name))
         po <- construct_pomp(path, tmp_df)
     })
 
@@ -64,7 +64,7 @@ construct_spatpomp <- function(path,df,
     source(paste0(path,"object.R"))
     spo <- spatPomp(
         data = df %>% select(all_of(c(time_name,unit_name,obs_name))) %>% na.omit,
-        covar = df %>% select(all_of(c(time_name,unit_name,unit_covar,shared_covar))),
+        covar = df %>% select(all_of(c(time_name,unit_name,covar_names))),
         times = time_name,
         units = unit_name,
         t0 = df$time[1]-1/365,
@@ -340,22 +340,27 @@ run_spatial_fitting <- function(po,n_cores,parameters,
                                 resultw_path,resultl_path,
                                 log_path,traces_path,stats_path
                                 ) {
-    
-    #po=spo
-    #parameters=init_vals
-    #unitParNames=paste0(est_specific,"_")
-    #sharedParNames=paste0(est_shared,"_")
-    #par_names=c(specific_pars,shared_pars)
-    #seed_num=seed
-    #Np1=5
-    #Np2=5
-    #Nbpf=1
-    #block_size=2
-    #resultw_path=paste0(path,"results.csv")
-    #resultl_path=paste0(path,"results_long.csv")
-    #log_path=paste0(path,"log.txt")
-    #traces_path=paste0(path,"traces.csv")
-    #stats_path=paste0(path,"stats.csv")
+
+    po=spo
+    n_cores=n_cores
+    parameters=init_vals
+    unitParNames=paste0(est_specific,"_")
+    sharedParNames=paste0(est_shared,"_")
+    par_names=c(specific_pars,shared_pars)
+    seed_num=seed
+    rdd1=rdd1
+    rdd2=rdd2
+    rdd3=rdd3
+    n_refine=n_refine
+    Np1=3
+    Np2=3
+    Nbpf=3
+    block_size=2
+    resultw_path=paste0(path,"results.csv")
+    resultl_path=paste0(path,"results_long.csv")
+    log_path=paste0(path,"log.txt")
+    traces_path=paste0(path,"traces.csv")
+    stats_path=paste0(path,"stats.csv")
     
     cl <- parallel::makeCluster(n_cores)
     registerDoParallel(cl)
