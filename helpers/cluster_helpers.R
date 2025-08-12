@@ -341,26 +341,26 @@ run_spatial_fitting <- function(po,n_cores,parameters,
                                 log_path,traces_path,stats_path
                                 ) {
 
-    po=spo
-    n_cores=n_cores
-    parameters=init_vals
-    unitParNames=paste0(est_specific,"_")
-    sharedParNames=paste0(est_shared,"_")
-    par_names=c(specific_pars,shared_pars)
-    seed_num=seed
-    rdd1=rdd1
-    rdd2=rdd2
-    rdd3=rdd3
-    n_refine=n_refine
-    Np1=3
-    Np2=3
-    Nbpf=3
-    block_size=2
-    resultw_path=paste0(path,"results.csv")
-    resultl_path=paste0(path,"results_long.csv")
-    log_path=paste0(path,"log.txt")
-    traces_path=paste0(path,"traces.csv")
-    stats_path=paste0(path,"stats.csv")
+    #po=spo
+    #n_cores=n_cores
+    #parameters=init_vals
+    #unitParNames=paste0(est_specific,"_")
+    #sharedParNames=paste0(est_shared,"_")
+    #par_names=c(specific_pars,shared_pars)
+    #seed_num=seed
+    #rdd1=rdd1
+    #rdd2=rdd2
+    #rdd3=rdd3
+    #n_refine=n_refine
+    #Np1=3
+    #Np2=3
+    #Nbpf=3
+    #block_size=2
+    #resultw_path=paste0(path,"results.csv")
+    #resultl_path=paste0(path,"results_long.csv")
+    #log_path=paste0(path,"log.txt")
+    #traces_path=paste0(path,"traces.csv")
+    #stats_path=paste0(path,"stats.csv")
     
     cl <- parallel::makeCluster(n_cores)
     registerDoParallel(cl)
