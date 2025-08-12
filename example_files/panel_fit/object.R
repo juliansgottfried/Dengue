@@ -61,8 +61,6 @@ obs_vars <- "cases"
 
 loc_key <- "loc"
 
-aggregate_key <- "aggregate"
-
 param_bounds <- list(
     delta=c(1/60,1/60),
     beta=c(5,20),

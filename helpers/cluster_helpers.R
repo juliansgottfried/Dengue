@@ -1,5 +1,4 @@
 construct_pomp <- function(path, df) {
-
 	source(paste0(path, "object.R"))
 	covariates <- df %>% select(-all_of(obs_vars))
 	covariates <- covariate_table(covariates, times = "time")
@@ -59,33 +58,27 @@ construct_panelpomp <- function(path, nseq) {
     return(ppo)
 }
 
-construct_spatpomp <- function(path) {
-    df <- read_csv(paste0(path,"dataset.csv"))
-    
+construct_spatpomp <- function(path,df,
+                               basic_par_names,
+                               par_trans) {
     source(paste0(path,"object.R"))
-    
-    dt <- 1/365
-    
     spo <- spatPomp(
         data = df %>% select(all_of(c(time_name,unit_name,obs_name))) %>% na.omit,
-        covar = df %>% select(all_of(c(time_name,unit_name,covar_names))),
+        covar = df %>% select(all_of(c(time_name,unit_name,unit_covar,shared_covar))),
         times = time_name,
         units = unit_name,
-        t0 = df$time[1]-dt,
+        t0 = df$time[1]-1/365,
         unit_statenames = c(state_names,accum_names),
         unit_accumvars = accum_names,
         paramnames = basic_par_names,
         rinit = rinit,
-        rprocess = euler(rproc, delta.t=dt),
+        rprocess = euler(rproc, delta.t=1/365),
         dunit_measure = dunit_meas,
         runit_measure = runit_meas,
         dmeasure = dmeas,
         rmeasure = rmeas,
         globals = global_vals,
-        partrans = parameter_trans(
-            log = log_transf,
-            logit = logit_transf,
-            barycentric = barycentric_transf)
+        partrans = par_trans
     )
 }
 
@@ -339,6 +332,7 @@ run_panel_fitting <- function(
 
 run_spatial_fitting <- function(po,n_cores,parameters,
                                 unitParNames,sharedParNames,
+                                par_names,
                                 seed_num,
                                 rdd1,rdd2,rdd3,
                                 n_refine,Np1,Np2,Nbpf,
@@ -349,12 +343,13 @@ run_spatial_fitting <- function(po,n_cores,parameters,
     
     #po=spo
     #parameters=init_vals
-    #unitParNames=est_specific
-    #sharedParNames=est_shared
+    #unitParNames=paste0(est_specific,"_")
+    #sharedParNames=paste0(est_shared,"_")
+    #par_names=c(specific_pars,shared_pars)
     #seed_num=seed
     #Np1=5
     #Np2=5
-    #Nbpf=3
+    #Nbpf=1
     #block_size=2
     #resultw_path=paste0(path,"results.csv")
     #resultl_path=paste0(path,"results_long.csv")
@@ -378,6 +373,7 @@ run_spatial_fitting <- function(po,n_cores,parameters,
         #coef(po) <- param
         #sim <- po %>% simulate(nsim=10,format="data.frame")
         #bpfs <- po %>% bpfilter(Np=10,block_size=2,save_states=T)
+        #bpfs@loglik
         
         cat(paste("Starting iteration", i, "\n"),
             file = log_path,
@@ -429,9 +425,8 @@ run_spatial_fitting <- function(po,n_cores,parameters,
                             "loglik","loglik.se","flag")
         
         keys <- po@unit_names
-        unique_pars <- paste0(c(specific_pars,shared_pars),1)
-        resultl <- matrix(rep(NA, length(keys)*(length(unique_pars) + 5)),nrow=length(keys))
-        colnames(resultl) <- c("sample","unit",unique_pars,
+        resultl <- matrix(rep(NA, length(keys)*(length(par_names) + 5)),nrow=length(keys))
+        colnames(resultl) <- c("sample","unit",par_names,
                                "loglik","loglik.se","flag")
         resultl <- data.frame(resultl)
         resultl$unit <- keys
@@ -466,15 +461,13 @@ run_spatial_fitting <- function(po,n_cores,parameters,
                 par_out <- coef(bpfout)
                 resultw[names(par_out)] <- par_out
                 
-                ordered_par_names <- unique(paste0(unlist(lapply(str_split(names(par_out),"_"),\(.) .[1])),"_1"))
+                ordered_par_names <- unique(unlist(lapply(str_split(names(par_out),"_"),\(.) .[1])))
                 
-                listed <- rep(list(1:length(keys)),length(par_out)/length(keys))
+                listed <- setNames(rep(list(1:length(keys)),length(par_out)/length(keys)),ordered_par_names)
                 for (i in 1:length(listed)) {
                     listed[[i]] <- listed[[i]]+5*(i-1)
                     listed[[i]] <- unname(par_out[listed[[i]]])
                 }
-                names(listed) <- ordered_par_names
-                
                 par_out <- data.frame(listed)
                 
                 resultl[,colnames(par_out)] <- par_out

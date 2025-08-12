@@ -4,9 +4,6 @@ obs_name <- "cases"
 
 unit_covar <- c("pop","dpopdt")
 shared_covar <- c()
-covar_names <- c(unit_covar,shared_covar)
-
-U <- 4
 
 state_names <- c("S","I","R")
 accum_names <- c("C")
@@ -15,22 +12,11 @@ ivp_pars <- paste0(state_names,"0_")
 specific_pars <- c("rho_","sigma_",ivp_pars)
 shared_pars <- c("delta_","beta_","gamma_")
 
-par_list <- lapply(c(specific_pars,shared_pars),\(.) paste0(rep(.,U),1:U))
-names(par_list) <- c(specific_pars,shared_pars)
+log_transf <- c("delta_","beta_","gamma_","sigma_")
 
-basic_par_list <- c(par_list[c(specific_pars)],
-                    setNames(as.vector(paste0(shared_pars,1),mode="list"),shared_pars))
+logit_transf <- c("rho_",ivp_pars)
 
-par_names <- unname(unlist(par_list))
-basic_par_names <- unname(unlist(basic_par_list))
-
-get_transf <- function(pars) {unname(unlist(basic_par_list[pars]))}
-
-log_transf <- get_transf(c("delta_","beta_","gamma_","sigma_"))
-
-logit_transf <- get_transf(c("rho_",ivp_pars))
-
-barycentric_transf <- get_transf(NULL)
+barycentric_transf <- NULL
 
 param_bounds <- list(
     delta_=c(1/60,1/60),
@@ -41,13 +27,6 @@ param_bounds <- list(
     I0_=c(0,0.01),
     R0_=c(0,0.4),
     sigma_=c(0.01,0.1))
-
-param_bounds <- unlist(lapply(names(param_bounds),\(.) {
-    params <- par_list[[.]]
-    expanded_bounds <- rep(list(param_bounds[[.]]),length(params))
-    names(expanded_bounds) <- par_list[[.]]
-    return(expanded_bounds)
-}), recursive=F)
 
 global_vals <-  spatPomp_Csnippet("
     const double D[4][4] = {
@@ -61,7 +40,7 @@ global_vals <-  spatPomp_Csnippet("
 rinit <- spatPomp_Csnippet(
     unit_statenames = c(state_names,accum_names),
     unit_covarnames = unit_covar,
-    unit_paramnames = c(specific_pars,shared_pars),
+    unit_paramnames = paste0(c(specific_pars,shared_pars),"_"),
     code = "
         for (int u=0; u<U; u++) {
             double m = pop[u]/(S0_[u]+I0_[u]+R0_[u]);
@@ -77,7 +56,7 @@ rinit <- spatPomp_Csnippet(
 rproc <- spatPomp_Csnippet(
     unit_statenames = c(state_names,accum_names),
     unit_covarnames = unit_covar,
-    unit_paramnames = c(specific_pars,shared_pars),
+    unit_paramnames = paste0(c(specific_pars,shared_pars),"_"),
     code = "
         for (int u=0; u<U; u++) {
             S[u] = S[u]>0 ? floor(S[u]) : 0;
