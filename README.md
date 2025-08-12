@@ -1,6 +1,8 @@
 ## To set up directories
 
 ### On the cluster
+This is the pannel pomp branch..
+
 
 Run the following lines:
 ```
